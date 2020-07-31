@@ -75,7 +75,7 @@ class CNN(torch.nn.Module):
 
 
 if __name__ == '__main__':
-    train_data = pd.read_csv('../train/train.tsv', sep='\t')
+    train_data = pd.read_csv('../test/train.tsv', sep='\t')
     test_data = pd.read_csv('../test/test.tsv', sep='\t')
 
     train_phrase = list(train_data['Phrase'][:10000])

@@ -21,7 +21,7 @@ class FNN(torch.nn.Module):
 
 
 if __name__ == '__main__':
-    trainData = pd.read_csv("../train/train.tsv", sep='\t')
+    trainData = pd.read_csv("../test/train.tsv", sep='\t')
 
     trainPhrase = trainData['Phrase'][:1000]
     trainSentiment = trainData['Sentiment'][:1000]

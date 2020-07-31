@@ -1,10 +1,9 @@
-import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 
 if __name__ == '__main__':
-    trainData = pd.read_csv("../train/train.tsv", sep='\t')
+    trainData = pd.read_csv("../test/train.tsv", sep='\t')
     trainPhrase = trainData['Phrase']
     trainSentiment = trainData['Sentiment']
 
