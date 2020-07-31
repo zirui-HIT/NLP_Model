@@ -1,0 +1,2 @@
+snli_1.0_train.jsonl filter=lfs diff=lfs merge=lfs -text
+snli_1.0_train.txt filter=lfs diff=lfs merge=lfs -text
