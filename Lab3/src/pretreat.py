@@ -1,6 +1,7 @@
 from data import load_data
 
 DIM = 50
+DATA_SIZE = 50000
 
 
 def make_vocabulary(sentence, vec_path):
@@ -12,7 +13,9 @@ def make_vocabulary(sentence, vec_path):
         words = re.split(r'[-\";,.!?\.\s]', words)
         vocabulary = vocabulary + words
     for i in range(len(vocabulary)):
-        vocabulary[i] = vocabulary[i].rstrip('\'').rstrip('\'s').lower()
+        t = vocabulary[i]
+        t = t.rstrip('\'').rstrip('\'s').strip().lower()
+        vocabulary[i] = t
     vocabulary = set(vocabulary)
 
     final_vocabulary = [0]
@@ -35,7 +38,7 @@ def make_vector(vocabulary, vec_file, out_file):
 
     num = 0
     keys = vocabulary.keys()
-    length = len(vocabulary)
+    length = len(vocabulary) + 1
 
     file = open(vec_file, 'r', encoding='utf-8')
     for line in file:
@@ -46,7 +49,7 @@ def make_vector(vocabulary, vec_file, out_file):
             match[vocabulary[word[0]]] = vec
             num = num + 1
 
-        if num == length:
+        if num == length - 1:
             break
     file.close()
 
@@ -54,18 +57,17 @@ def make_vector(vocabulary, vec_file, out_file):
 
     file = open(out_file, 'w')
     for i in range(length):
-        if i in match.keys():
-            for j in range(DIM):
-                file.write(str(match[i][j]) + ' ')
+        for j in range(DIM):
+            file.write(str(match[i][j]) + ' ')
         file.write('\n')
     file.close()
 
 
 if __name__ == '__main__':
     train_sentence1, train_sentence2, train_label = load_data(
-        '../test/snli_1.0_train.txt', 50000)
+        '../test/snli_1.0_train.txt', DATA_SIZE)
     test_sentence1, test_sentence2, ttest_label = load_data(
-        '../test/snli_1.0_test.txt')
+        '../test/snli_1.0_test.txt', DATA_SIZE)
 
     make_vocabulary(
         train_sentence1 + train_sentence2 + test_sentence1 + test_sentence2,
