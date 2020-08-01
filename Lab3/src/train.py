@@ -7,7 +7,7 @@ import torch.utils.data as Data
 def train(train_data_path,
           vocabulary_path,
           embedding_matrix_path,
-          data_size,
+          data_size=5000,
           hidden_dim=50,
           batch_size=1000,
           lr=0.2,
