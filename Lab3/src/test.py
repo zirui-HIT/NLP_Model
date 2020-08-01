@@ -14,9 +14,6 @@ def test(
 
     vocabulary = data.load_vocabulary(vocabulary_path)
 
-    embedding_matrix = data.load_embedding(embedding_matrix_path)
-    embedding_matrix = data.list2torch(embedding_matrix)
-
     sentence1 = data.tokenizer(sentence1, vocabulary)
     sentence2 = data.tokenizer(sentence2, vocabulary)
     sentence1 = data.padding(sentence1)

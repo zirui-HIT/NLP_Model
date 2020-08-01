@@ -19,10 +19,12 @@ def train(train_data_path,
     embedding_matrix = data.load_embedding(embedding_matrix_path)
     embedding_matrix = data.list2torch(embedding_matrix)
 
-    sentence1 = data.tokenizer(sentence1, vocabulary)
-    sentence2 = data.tokenizer(sentence2, vocabulary)
-    sentence1 = data.padding(sentence1)
-    sentence2 = data.padding(sentence2)
+    sentence1, max_length1 = data.tokenizer(sentence1, vocabulary)
+    sentence2, max_length2 = data.tokenizer(sentence2, vocabulary)
+    max_length = max(max_length1, max_length2)
+
+    sentence1 = data.padding(sentence1, max_length)
+    sentence2 = data.padding(sentence2, max_length)
     sentence1 = data.list2torch(sentence1)
     sentence2 = data.list2torch(sentence2)
 
@@ -36,7 +38,7 @@ def train(train_data_path,
                              num_workers=2)
 
     esim = ESIM(hidden_dim, len(vocabulary), embedding_matrix,
-                embedding_matrix.size(1))
+                embedding_matrix.size()[1])
     optimizer = torch.optim.Adam(esim.parameters(), lr=lr)
     loss_func = torch.nn.CrossEntropyLoss()
 

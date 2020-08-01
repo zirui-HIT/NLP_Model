@@ -12,8 +12,8 @@ class ESIM(torch.nn.Module):
                  dropout=0.5):
         super(ESIM, self).__init__()
 
-        self.embedder = layer.EmbeddingLayer(embedding_dim,
-                                             vocabulary_size,
+        self.embedder = layer.EmbeddingLayer(vocabulary_size,
+                                             embedding_dim,
                                              embedding_matrix,
                                              dropout=dropout)
         self.encoder = layer.EncodingLayer(embedding_dim, hidden_dim)
