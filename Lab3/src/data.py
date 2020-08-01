@@ -18,7 +18,7 @@ def load_vocabulary(path):
     return vocabulary
 
 
-def load_embedding(path, dim):
+def load_embedding(path):
     ret = []
 
     file = open(path, 'r')
