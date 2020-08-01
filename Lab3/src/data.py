@@ -59,6 +59,12 @@ def padding(sentence, max_length):
     return ret
 
 
+def list2torch(list_name):
+    import numpy as np
+    import torch
+    return torch.from_numpy(np.array(list_name)).type(torch.LongTensor)
+
+
 '''
 if __name__ == '__main__':
     train_sentence1, train_sentence2, train_label = load_data(
