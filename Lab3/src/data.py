@@ -65,6 +65,20 @@ def list2torch(list_name):
     return torch.from_numpy(np.array(list_name)).type(torch.LongTensor)
 
 
+def label2num(label):
+    ret = []
+
+    for x in label:
+        if x == 'neutral':
+            ret.append(0)
+        elif x == 'contradiction':
+            ret.append(1)
+        else:
+            ret.append(2)
+
+    return ret
+
+
 '''
 if __name__ == '__main__':
     train_sentence1, train_sentence2, train_label = load_data(
