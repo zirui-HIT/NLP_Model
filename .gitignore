@@ -3,3 +3,4 @@
 
 snli_1.0_train.jsonl
 snli_1.0_train.txt
+glove.6B.50d.txt
