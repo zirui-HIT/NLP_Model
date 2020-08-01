@@ -7,6 +7,7 @@ import torch.utils.data as Data
 def train(train_data_path,
           vocabulary_path,
           embedding_matrix_path,
+          save_path,
           data_size=5000,
           hidden_dim=50,
           batch_size=1000,
@@ -51,4 +52,5 @@ def train(train_data_path,
             loss.backward()
             optimizer.step()
 
+    torch.save(esim, save_path)
     return esim
