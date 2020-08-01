@@ -2,20 +2,6 @@ import torch
 from torch import nn
 
 
-class DropoutLayer(nn.Dropout):
-    def forward(self, x):
-        ones = x.data.new_ones(x.shape[0], x.shape[1])
-        dropout_mask = torch.nn.functional.dropout(ones,
-                                                   self.p,
-                                                   self.training,
-                                                   inplace=False)
-
-        if self.inplace:
-            x *= dropout_mask.unsqueeze(1)
-            return None
-        return dropout_mask.unsqueeze(1) * x
-
-
 class EmbeddingLayer(nn.Module):
     def __init__(self,
                  vocabulary_size,
@@ -26,7 +12,7 @@ class EmbeddingLayer(nn.Module):
 
         self.embedding = nn.Embedding(vocabulary_size, embedding_dim)
         self.embedding.weight.data.copy_(embedding_matrix)
-        self.dropout = DropoutLayer(dropout)
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         x = self.embedding(x)
@@ -66,7 +52,7 @@ class LocalInferenceLayer(nn.Module):
             h_mask.unsqueeze(1).float())
         e.masked_fill_(inference_mask < 1e-7, -1e7)
 
-        h_score, p_score = self.softmax_1(e), self.softmax_2(e)
+        h_score, p_score = self.softmax1(e), self.softmax2(e)
         h_ = h_score.transpose(1, 2).bmm(p)
         p_ = p_score.bmm(h)
 
@@ -85,7 +71,7 @@ class CompositionLayer(nn.Module):
                             hidden_dim,
                             num_layers=1,
                             bidirectional=True)
-        self.dropout = DropoutLayer(dropout)
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         x = self.hidden(x)
@@ -132,7 +118,7 @@ class OutputLayer(nn.Module):
     def __init__(self, input_dim, output_dim, result_num, dropout=0.5):
         super(OutputLayer, self).__init__()
 
-        self.mlp = nn.Sequential(DropoutLayer(dropout),
+        self.mlp = nn.Sequential(nn.Dropout(dropout),
                                  nn.Linear(input_dim, output_dim), nn.ReLU(),
                                  nn.Linear(output_dim, result_num))
 
