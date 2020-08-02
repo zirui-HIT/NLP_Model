@@ -28,7 +28,8 @@ class EncodingLayer(nn.Module):
         self.lstm = nn.LSTM(embedding_dim,
                             hidden_dim,
                             num_layers=1,
-                            bidirectional=True)
+                            bidirectional=True,
+                            batch_first=True)
 
     def forward(self, x):
         self.lstm.flatten_parameters()
@@ -70,7 +71,8 @@ class CompositionLayer(nn.Module):
         self.lstm = nn.LSTM(output_dim,
                             hidden_dim,
                             num_layers=1,
-                            bidirectional=True)
+                            bidirectional=True,
+                            batch_first=True)
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
