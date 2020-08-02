@@ -3,20 +3,14 @@ from torch import nn
 
 
 class EmbeddingLayer(nn.Module):
-    def __init__(self,
-                 vocabulary_size,
-                 embedding_dim,
-                 embedding_matrix,
-                 dropout=0.5):
+    def __init__(self, vocabulary_size, embedding_dim, embedding_matrix=None):
         super(EmbeddingLayer, self).__init__()
 
         self.embedding = nn.Embedding(vocabulary_size, embedding_dim)
         self.embedding.weight.data.copy_(embedding_matrix)
-        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         x = self.embedding(x)
-        x = self.dropout(x)
 
         return x
 
@@ -64,7 +58,7 @@ class LocalInferenceLayer(nn.Module):
 
 
 class CompositionLayer(nn.Module):
-    def __init__(self, input_dim, output_dim, hidden_dim, dropout=0.5):
+    def __init__(self, input_dim, output_dim, hidden_dim, dropout=0.0):
         super(CompositionLayer, self).__init__()
 
         self.hidden = nn.Linear(input_dim, output_dim)
@@ -100,13 +94,11 @@ class PoolingLayer(nn.Module):
 
 
 class InferenceCompositionLayer(nn.Module):
-    def __init__(self, input_dim, output_dim, hidden_dim, dropout=0.5):
+    def __init__(self, input_dim, output_dim, hidden_dim, dropout=0.0):
         super(InferenceCompositionLayer, self).__init__()
 
-        self.composition = CompositionLayer(input_dim,
-                                            output_dim,
-                                            hidden_dim,
-                                            dropout=dropout)
+        self.composition = CompositionLayer(input_dim, output_dim, hidden_dim,
+                                            dropout)
         self.pooling = PoolingLayer()
 
     def forward(self, m_p, m_h, p_mask, h_mask):
@@ -117,7 +109,7 @@ class InferenceCompositionLayer(nn.Module):
 
 
 class OutputLayer(nn.Module):
-    def __init__(self, input_dim, output_dim, result_num, dropout=0.5):
+    def __init__(self, input_dim, output_dim, result_num, dropout=0.0):
         super(OutputLayer, self).__init__()
 
         self.mlp = nn.Sequential(nn.Dropout(dropout),

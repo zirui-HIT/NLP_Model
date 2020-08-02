@@ -7,8 +7,9 @@ if __name__ == '__main__':
                '../data/word2vec.txt',
                '../model/esim.pkl',
                lr=0.02,
-               hidden_dim=300,
-               batch_size=2048)
+               hidden_dim=512,
+               batch_size=2048,
+               epoch=20)
     result = test(nn,
                   '../test/snli_1.0_test.txt',
                   '../data/vocabulary.txt',

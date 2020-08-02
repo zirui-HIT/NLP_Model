@@ -4,13 +4,11 @@ import torch
 import numpy as np
 
 
-def test(
-    esim,
-    test_data_path,
-    vocabulary_path,
-    embedding_matrix_path,
-    data_size=None
-):
+def test(esim,
+         test_data_path,
+         vocabulary_path,
+         embedding_matrix_path,
+         data_size=None):
     sentence1, sentence2, label = data.load_data(test_data_path, data_size)
 
     vocabulary = data.load_vocabulary(vocabulary_path)
@@ -21,13 +19,13 @@ def test(
 
     sentence1 = data.padding(sentence1, max_length)
     sentence2 = data.padding(sentence2, max_length)
-    sentence1 = data.list2torch(sentence1)
-    sentence2 = data.list2torch(sentence2)
+    sentence1 = data.list2torch(sentence1, torch.LongTensor)
+    sentence2 = data.list2torch(sentence2, torch.LongTensor)
 
     label = data.label2num(label)
     label = np.array(label)
 
-    _, out = esim(sentence1, sentence2)
+    out = esim(sentence1, sentence2)
     predicate_label = torch.max(out, 1)[1]
     predicate_label = predicate_label.numpy()
 

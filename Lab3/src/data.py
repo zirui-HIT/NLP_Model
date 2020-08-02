@@ -23,7 +23,10 @@ def load_embedding(path):
 
     file = open(path, 'r')
     for line in file:
-        ret.append([float(s) for s in line.split()])
+        tmp = []
+        for s in line.split():
+            tmp.append(float(s))
+        ret.append(tmp)
 
     return ret
 
@@ -59,10 +62,10 @@ def padding(sentence, max_length):
     return ret
 
 
-def list2torch(list_name):
+def list2torch(list_name, TYPE):
     import numpy as np
     import torch
-    return torch.from_numpy(np.array(list_name)).type(torch.LongTensor)
+    return torch.from_numpy(np.array(list_name)).type(TYPE)
 
 
 def label2num(label):
