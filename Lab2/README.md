@@ -26,4 +26,4 @@
 * 采用批训练，批大小为1000
 * 训练代数为20
 
-[总结地址](https://www.cnblogs.com/WDZRMPCBIT/p/13399299.html)
+[博客总结](https://www.cnblogs.com/WDZRMPCBIT/p/13399299.html)
