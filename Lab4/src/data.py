@@ -3,7 +3,11 @@ def load_data(path):
     data = []
 
     for line in file:
-        data.append(line.split())
+        words = line.split()
+        words.append('<END>')
+        words.insert(0, '<BEGIN>')
+
+        data.append(words)
     vocabulary = set([x for line in data for x in line])
 
     return data, list(vocabulary)
