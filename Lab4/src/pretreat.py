@@ -7,4 +7,4 @@ def make_embedding_matrix(input_path, embedding_dim, output_path):
 
 
 if __name__ == '__main__':
-    make_embedding_matrix('all_text.txt', 50, '../data/word2vec.txt')
+    make_embedding_matrix('../test/all_text.txt', 50, '../data/word2vec.txt')
