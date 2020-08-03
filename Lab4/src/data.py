@@ -28,19 +28,19 @@ def load_embedding(embedding_path):
         vec = line.split()
 
         match[vec[0]] = cnt
-        matrix.append(vec[1:])
+        matrix.append([float(x) for x in vec[1:]])
         cnt = cnt + 1
 
     return match, matrix
 
 
-def padding(sentence, max_length):
+def padding(sentence, max_length, pad=0):
     ret = []
 
     for s in sentence:
         tmp = s[:max_length]
         for i in range(max_length - len(tmp)):
-            tmp.append(0)
+            tmp.append(pad)
         ret.append(tmp)
 
     return ret
@@ -80,10 +80,13 @@ def label2num(label):
         'B-LOC': 8
     }
 
+    max_length = 0
+
     for s in label:
         vec = []
         for w in s:
             vec.append(match[w])
+        max_length = max(max_length, len(vec))
         ret.append(vec)
 
-    return ret
+    return ret, max_length

@@ -2,7 +2,10 @@ def make_embedding_matrix(input_path, embedding_dim, output_path):
     from gensim.models import word2vec
 
     sentences = word2vec.Text8Corpus(input_path)
-    model = word2vec.Word2Vec(sentences, size=embedding_dim, window=5)
+    model = word2vec.Word2Vec(sentences,
+                              size=embedding_dim,
+                              window=5,
+                              min_count=0)
     model.wv.save_word2vec_format(output_path, binary=False)
 
 
