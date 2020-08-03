@@ -1,9 +1,14 @@
-def load_data(path):
+def load_data(path, data_size=None):
     file = open(path, 'r')
     data = []
+    cnt = 0
 
     for line in file:
+        if cnt == data_size:
+            break
+
         data.append(line.split())
+        cnt = cnt + 1
     vocabulary = set([x for line in data for x in line])
 
     return data, list(vocabulary)
