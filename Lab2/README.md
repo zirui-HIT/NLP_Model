@@ -1,6 +1,6 @@
 题目地址：[电影评价的情感分析](https://www.kaggle.com/c/sentiment-analysis-on-movie-reviews/overview)
 
-### FNN
+### DNN
 * 采用词袋模型
 * 用PCA进行降维
 * 1输入层+1全连接层+1输出层
