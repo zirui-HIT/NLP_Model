@@ -13,3 +13,4 @@
 * Lab3：基于注意力机制的文本匹配
 * Lab4：基于biLSTM+CRF的序列标注
 * Lab5：基于LSTM的语言模型
+* Lab6：基于transformer的情感分析
