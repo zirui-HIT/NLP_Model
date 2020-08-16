@@ -66,8 +66,16 @@ def train(input_path='../test/train.tsv',
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-    
+        print(out.data)
+
     torch.save(transformer, model_path)
 
 
-train(data_size=1000)
+train(data_size=None,
+      epoch=20,
+      lr=0.02,
+      head_num=4,
+      hidden_size=256,
+      hidden_dim=128,
+      hidden_layer=4,
+      dropout=0.5)
