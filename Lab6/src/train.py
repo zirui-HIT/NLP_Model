@@ -55,7 +55,7 @@ def train(input_path='../test/train.tsv',
                               hidden_dim=hidden_dim,
                               hidden_layer=hidden_layer,
                               dropout=dropout)
-    optimizer = torch.optim.Adam(transformer.parameters(), lr=lr)
+    optimizer = torch.optim.Adadelta(transformer.parameters(), lr=lr)
     loss_func = torch.nn.CrossEntropyLoss()
 
     for e in range(epoch):
