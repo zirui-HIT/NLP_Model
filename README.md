@@ -1,9 +1,8 @@
-# NLP练习实验
-
-确定要从头开始重写了hhh
-
-Lab1大概率要删掉，机器学习方法基本用不到了
-
-Lab4正在纠结还要不要重写，毕竟CRF有点烦……
-
-主要是想形成自己的代码框架和风格，将来就可以直接用了
+# NLP常用模型
+* [FastText](https://arxiv.org/pdf/1607.01759.pdf)
+* [BiLSTM+CRF](https://arxiv.org/pdf/1603.01360.pdf)
+* [TextCNN](https://arxiv.org/pdf/1510.03820v2.pdf)
+* [ELMo](https://arxiv.org/pdf/1802.05365.pdf)
+* [transformer](https://arxiv.org/pdf/1706.03762v5.pdf)
+* [GPT](https://s3-us-west-2.amazonaws.com/openai-assets/research-covers/language-unsupervised/language_understanding_paper.pdf)
+* [BERT](https://arxiv.org/pdf/1810.04805.pdf)
