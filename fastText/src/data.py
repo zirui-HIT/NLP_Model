@@ -53,6 +53,34 @@ class Vocabulary(object):
         else:
             return self._index2word[key]
 
+    def load(self, path: str):
+        """load vocabulary from path
+
+        Args:
+            path: path of vocabulary
+        """
+        self._word2index.clear()
+        self._index2word.clear()
+        with open(path, 'r') as f:
+            for line in f:
+                items = line.split()
+                word = items[0]
+                index = int(items[1])
+
+                self._word2index[word] = index
+                self._index2word[index] = word
+        self._word_count = len(self._word2index)
+
+    def dump(self, path: str):
+        """dump vocabulary to given path
+
+        Args:
+            path: path to be dumped
+        """
+        with open(path, 'w') as f:
+            for w in self._word2index:
+                f.write('%s %s\n' % (w, self._word2index[w]))
+
     def __hash__(self):
         return hash(self._word2index)
 
