@@ -18,6 +18,8 @@ class Vocabulary(object):
         self._index2word: Dict[int, str] = {}
         self._word2index: Dict[str, int] = {}
 
+        self.append(['BOS', 'EOS', 'SEP', 'PAD'])
+
     def append(self, words: List[str]):
         """Append words to vocabulary
 
@@ -45,6 +47,8 @@ class Vocabulary(object):
             Corresponding value to get
         """
         if isinstance(key, str):
+            if not(key in self._word2index):
+                return self._word2index['SEP']
             return self._word2index[key]
         else:
             return self._index2word[key]
