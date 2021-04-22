@@ -190,7 +190,7 @@ class DataManager(object):
         words = []
         labels = []
         for s in self._sentences:
-            words.append(s.word())
+            words.append(s.words())
             labels.append(s.label())
 
         return DataLoader(dataset=_DataSet(words, labels),
@@ -236,5 +236,6 @@ if __name__ == '__main__':
     valid_vocabulary = valid_dm.load(
         'Data/Sentiment_Analysis_on_Movie_Reviews/valid.tsv')
 
-    vocabulary = train_vocabulary + valid_vocabulary
-    pass
+    package = train_dm.package(32)
+    for current_sentences, current_labels in package:
+        pass
