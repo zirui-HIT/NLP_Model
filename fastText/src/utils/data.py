@@ -150,13 +150,14 @@ class DataManager(object):
         self._sentences: List[Sentence] = []
         self._mode = mode
 
-    def load(self, path: str) -> Vocabulary:
+    def load(self, path: str, max_length: int = None) -> Vocabulary:
         """load data from path
 
         data must be saved in .csv or .tsv file
 
         Args:
             path: path of data
+            max_length: max lines to load
 
         Returns:
             vocabulary of loading data
@@ -164,8 +165,13 @@ class DataManager(object):
         import pandas as pd
         data = pd.read_csv(path, sep='\t')
         vocabulary = Vocabulary()
+        if max_length is None:
+            max_length = len(data)
 
         for i in range(len(data)):
+            if i >= max_length:
+                break
+
             words = data['Phrase'][i].split()
             words = ['<BOS>'] + words + ['<EOS>']
             self._sentences.append(Sentence(
