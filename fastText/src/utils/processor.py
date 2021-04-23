@@ -103,8 +103,8 @@ class Processor(object):
         Args:
             path: path of model
         """
-        self._model.load_state_dict(torch.load(path))
-        self._vocabulary.load(path)
+        self._model.load_state_dict(torch.load(path + '.pkl'))
+        self._vocabulary.load(path + '.txt')
 
     def dump(self, path: str):
         """dump model and vocabulary to given path
@@ -112,8 +112,8 @@ class Processor(object):
         Args:
             path: path to be dumped
         """
-        torch.save(self._model.state_dict(), path)
-        self._vocabulary.dump(path)
+        torch.save(self._model.state_dict(), path + '.pkl')
+        self._vocabulary.dump(path + '.txt')
 
     def _wrap_sentence(self, sentences: List[List[str]]) -> List[List[int]]:
         indexes = [[self._vocabulary.get(w) for w in s] for s in sentences]

@@ -16,7 +16,7 @@ parser.add_argument('--mode',
 parser.add_argument('--model_path',
                     '-mp',
                     type=str,
-                    default='../model/fastText.pkl',
+                    default='../model/fastText',
                     help="path to save model")
 parser.add_argument('--max_length',
                     '-ml',
