@@ -65,7 +65,7 @@ parser.add_argument('--predict_data_path',
 parser.add_argument('--save_path',
                     '-sp',
                     type=str,
-                    default='../../Data/Sentiment_Analysis_on_Movie_Reviews/result_fastText.txt',
+                    default='../../Data/Sentiment_Analysis_on_Movie_Reviews/result_fastText.tsv',
                     help="output path")
 
 args = parser.parse_args()
