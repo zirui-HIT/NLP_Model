@@ -17,7 +17,7 @@ class Processor(object):
         self._model = None
         self._optimizer = None
 
-    def fit(self, path: str, train_data: DataManager, valid_data: DataManager = None) -> float:
+    def fit(self, path: str, train_data: DataManager, valid_data: DataManager = None, epoch: int = 1) -> float:
         """train model with data
 
         train model with train_data and update model by the accuracy of it
@@ -36,19 +36,22 @@ class Processor(object):
 
         best_accuracy = 0
         package = train_data.package(self._batch_size, self._shuffle)
-        for current_sentences, current_labels in tqdm(package, ncols=len(package)):
-            sentences, mask = self._wrap_sentence(current_sentences)
-            labels = torch.Tensor(current_labels, dtype=torch.LongTensor)
+        for e in len(epoch):
+            for current_sentences, current_labels in tqdm(package, ncols=len(package)):
+                sentences, mask = self._wrap_sentence(current_sentences)
+                labels = torch.Tensor(current_labels, dtype=torch.LongTensor)
 
-            predict_labels = self._model(sentences, mask)
-            loss = self._loss_function(predict_labels, labels)
+                predict_labels = self._model(sentences, mask)
+                loss = self._loss_function(predict_labels, labels)
 
-            self._optimizer.zero_grad()
-            loss.backward()
-            self._optimizer.step()
+                self._optimizer.zero_grad()
+                loss.backward()
+                self._optimizer.step()
 
             if self.validate(valid_data) > best_accuracy:
                 self.dump(path)
+
+            print("epoch %d best accuracy: %f" % (e, best_accuracy))
 
     def validate(self, data: DataManager) -> float:
         """validate model
