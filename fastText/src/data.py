@@ -198,6 +198,15 @@ class DataManager(object):
                           shuffle=shuffle,
                           collate_fn=_collate_fn)
 
+    def labels(self) -> List[int]:
+        """labels of data
+
+        Returns:
+            labels of data
+        """
+        ret = [s.label() for s in self._sentences]
+        return ret
+
     def __len__(self):
         return len(self._sentences)
 
