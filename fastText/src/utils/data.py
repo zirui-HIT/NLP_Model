@@ -104,15 +104,17 @@ class Sentence(object):
     """Record sentence info
     """
 
-    def __init__(self, words, label: int):
+    def __init__(self, words: List[str], label: int, pid: int):
         """Instantiate sentence
 
         Args:
             words: words of sentence
             label: label of sentence
+            pid: id of phrase
         """
         self._words = deepcopy(words)
         self._label = label
+        self._pid = pid
 
     def words(self):
         """words of sentence
@@ -129,6 +131,14 @@ class Sentence(object):
             label of sentence
         """
         return self._label
+
+    def pid(self) -> int:
+        """pid of sentence
+
+        Returns:
+            pid of sentence
+        """
+        return self._pid
 
     def __len__(self):
         return len(self._words)
@@ -175,7 +185,7 @@ class DataManager(object):
             words = data['Phrase'][i].split()
             words = ['<BOS>'] + words + ['<EOS>']
             self._sentences.append(Sentence(
-                words, data['Sentiment'][i]))
+                words, data['Sentiment'][i], data['PhraseId'][i]))
 
             vocabulary.append(words)
 
@@ -211,6 +221,15 @@ class DataManager(object):
             labels of data
         """
         ret = [s.label() for s in self._sentences]
+        return ret
+
+    def pids(self) -> List[int]:
+        """pids of data
+
+        Returns:
+            pids of data
+        """
+        ret = [s.pid() for s in self._sentences]
         return ret
 
     def __len__(self):
