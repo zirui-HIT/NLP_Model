@@ -14,7 +14,6 @@ class Processor(object):
         self._batch_size = batch_size
         self._shuffle = shuffle
 
-        # TODO
         self._loss = deepcopy(loss)
         self._model = deepcopy(model)
         self._optimizer = deepcopy(optimizer)
