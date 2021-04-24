@@ -10,7 +10,6 @@ class Vocabulary(object):
 
     Attributes:
     """
-
     def __init__(self):
         """Instantiate vocabulary
         """
@@ -47,7 +46,7 @@ class Vocabulary(object):
             Corresponding value to get
         """
         if isinstance(key, str):
-            if not(key in self._word2index):
+            if not (key in self._word2index):
                 return self._word2index['SEP']
             return self._word2index[key]
         else:
@@ -103,7 +102,6 @@ class Vocabulary(object):
 class Sentence(object):
     """Record sentence info
     """
-
     def __init__(self, words: List[str], label: int, pid: int):
         """Instantiate sentence
 
@@ -150,7 +148,6 @@ class Sentence(object):
 class DataManager(object):
     """Record all items of data
     """
-
     def __init__(self, mode: str):
         """Instantiate dataset
 
@@ -171,10 +168,12 @@ class DataManager(object):
 
         Returns:
             vocabulary of loading data
+            occurrence of every label 
         """
         import pandas as pd
         data = pd.read_csv(path, sep='\t')
         vocabulary = Vocabulary()
+        count: Dict[str, int] = {}
         if max_length is None:
             max_length = len(data)
 
@@ -184,12 +183,15 @@ class DataManager(object):
 
             words = data['Phrase'][i].split()
             words = ['<BOS>'] + words + ['<EOS>']
-            self._sentences.append(Sentence(
-                words, data['Sentiment'][i], data['PhraseId'][i]))
+            label = data['Sentiment'][i]
 
+            self._sentences.append(Sentence(words, label, data['PhraseId'][i]))
+            if not (label in count):
+                count[label] = 0
+            count[label] += 1
             vocabulary.append(words)
 
-        return vocabulary
+        return vocabulary, count
 
     def package(self, batch_size: int, shuffle: bool = False):
         """package data

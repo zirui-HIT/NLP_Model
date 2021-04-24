@@ -2,13 +2,13 @@ from config import args
 from utils.data import DataManager
 from utils.processor import Processor
 
-
 if __name__ == '__main__':
     if args.mode == 'train':
         train_data = DataManager('train')
         valid_data = DataManager('valid')
 
-        vocabulary = train_data.load(args.train_data_path, args.max_length)
+        vocabulary, count = train_data.load(args.train_data_path,
+                                            args.max_length)
         valid_data.load(args.valid_data_path, args.max_length)
 
         processor = Processor(vocabulary, args.batch_size, True)
