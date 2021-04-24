@@ -7,17 +7,23 @@ from tqdm import tqdm
 
 
 class Processor(object):
-    def __init__(self, vocabulary: Vocabulary, batch_size: int, shuffle: bool):
+    def __init__(self, vocabulary: Vocabulary, batch_size: int, shuffle: bool,
+                 model: torch.nn.Module, optimizer: torch.optim.Optimizer,
+                 loss: torch.nn.modules.loss._Loss):
         self._vocabulary = deepcopy(vocabulary)
         self._batch_size = batch_size
         self._shuffle = shuffle
 
         # TODO
-        self._loss = None
-        self._model = None
-        self._optimizer = None
+        self._loss = deepcopy(loss)
+        self._model = deepcopy(model)
+        self._optimizer = deepcopy(optimizer)
 
-    def fit(self, path: str, train_data: DataManager, valid_data: DataManager = None, epoch: int = 1) -> float:
+    def fit(self,
+            path: str,
+            train_data: DataManager,
+            valid_data: DataManager = None,
+            epoch: int = 1) -> float:
         """train model with data
 
         train model with train_data and update model by the accuracy of it
@@ -37,12 +43,13 @@ class Processor(object):
         best_accuracy = 0
         package = train_data.package(self._batch_size, self._shuffle)
         for e in len(epoch):
-            for current_sentences, current_labels in tqdm(package, ncols=len(package)):
-                sentences, mask = self._wrap_sentence(current_sentences)
+            for current_sentences, current_labels in tqdm(package,
+                                                          ncols=len(package)):
+                sentences = self._wrap_sentence(current_sentences)
                 labels = torch.Tensor(current_labels, dtype=torch.LongTensor)
 
-                predict_labels = self._model(sentences, mask)
-                loss = self._loss_function(predict_labels, labels)
+                predict_labels = self._model(sentences)
+                loss = self._loss(predict_labels, labels)
 
                 self._optimizer.zero_grad()
                 loss.backward()
@@ -126,6 +133,5 @@ class Processor(object):
         for i in range(indexes):
             indexes[i] = indexes[i] + \
                 [pad_index for i in range((length - len(indexes)))]
-        mask = torch.tensor(np.where(indexes != pad_index, 1))
 
         return torch.Tensor(indexes, dtype=torch.LongTensor)
