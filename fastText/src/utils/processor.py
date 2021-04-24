@@ -8,13 +8,12 @@ from tqdm import tqdm
 
 class Processor(object):
     def __init__(self, vocabulary: Vocabulary, batch_size: int, shuffle: bool,
-                 model: torch.nn.Module, optimizer: torch.optim.Optimizer,
-                 loss: torch.nn.modules.loss._Loss):
+                 model: torch.nn.Module, optimizer: torch.optim.Optimizer):
         self._vocabulary = deepcopy(vocabulary)
         self._batch_size = batch_size
         self._shuffle = shuffle
 
-        self._loss = deepcopy(loss)
+        self._loss = torch.nn.L1Loss()
         self._model = deepcopy(model)
         self._optimizer = deepcopy(optimizer)
 
