@@ -1,11 +1,11 @@
 import torch
 import numpy as np
-from huffman import HuffmanTree
-from data import Vocabulary, DataManager
 from copy import deepcopy
 from typing import List
 from tqdm import tqdm
-from model import FastText
+from utils.huffman import HuffmanTree
+from utils.data import Vocabulary, DataManager
+from utils.model import FastText
 
 
 class Processor(object):
@@ -47,7 +47,7 @@ class Processor(object):
 
         best_accuracy = 0
         package = train_data.package(self._batch_size, self._shuffle)
-        for e in len(epoch):
+        for e in range(epoch):
             for current_sentences, current_labels in tqdm(package,
                                                           ncols=len(package)):
                 sentences = self._wrap_sentence(current_sentences)
@@ -135,7 +135,7 @@ class Processor(object):
         length = len(max(indexes, key=len))
         pad_index = self._vocabulary.get('[PAD]')
 
-        for i in range(indexes):
+        for i in range(len(indexes)):
             indexes[i] = indexes[i] + \
                 [pad_index for i in range((length - len(indexes)))]
 

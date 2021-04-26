@@ -16,7 +16,7 @@ parser.add_argument('--mode',
 parser.add_argument('--model_path',
                     '-mp',
                     type=str,
-                    default='../model/fastText',
+                    default='fastText/model/fastText',
                     help="path to save model")
 parser.add_argument('--max_length',
                     '-ml',
@@ -33,12 +33,12 @@ parser.add_argument('--batch_size',
 parser.add_argument('--train_data_path',
                     '-tdp',
                     type=str,
-                    default='../../Data/Sentiment_Analysis_on_Movie_Reviews/train.tsv',
+                    default='Data/Sentiment_Analysis_on_Movie_Reviews/train.tsv',
                     help="path of train data")
 parser.add_argument('--valid_data_path',
                     '-vdq',
                     type=str,
-                    default='../../Data/Sentiment_Analysis_on_Movie_Reviews/valid.tsv',
+                    default='Data/Sentiment_Analysis_on_Movie_Reviews/valid.tsv',
                     help="path of valid data")
 parser.add_argument('--epoch',
                     '-e',
@@ -50,23 +50,28 @@ parser.add_argument('--learning_rate',
                     type=float,
                     default=1e-5,
                     help="learing rate")
-parser.add_argument('--dropout',
-                    '-d',
+parser.add_argument('--dropout_rate',
+                    '-dr',
                     type=float,
                     default=0.3,
                     help="dropout")
+parser.add_argument('--embedding_dim',
+                    '-ed',
+                    type=int,
+                    default=16,
+                    help='dimension of embedding layer')
 
 
 # test mode argument
 parser.add_argument('--predict_data_path',
                     '-pdp',
                     type=str,
-                    default='../../Data/Sentiment_Analysis_on_Movie_Reviews/test.tsv',
+                    default='Data/Sentiment_Analysis_on_Movie_Reviews/test.tsv',
                     help="path of test data")
 parser.add_argument('--save_path',
                     '-sp',
                     type=str,
-                    default='../../Data/Sentiment_Analysis_on_Movie_Reviews/result_fastText.tsv',
+                    default='Data/Sentiment_Analysis_on_Movie_Reviews/result_fastText.tsv',
                     help="output path")
 
 args = parser.parse_args()

@@ -13,6 +13,8 @@ class FastText(torch.nn.Module):
             tree_size: number of nodes of huffman tree
             padding_idx: sign of padding that will be ignored after embedding
         """
+        super(FastText, self).__init__()
+
         self._embedding = torch.nn.Embedding(num_embeddings=vocabulary_size,
                                              embedding_dim=embedding_dim,
                                              padding_idx=padding_idx)
