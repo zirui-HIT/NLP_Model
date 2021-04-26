@@ -1,22 +1,28 @@
 import torch
 import numpy as np
+from huffman import HuffmanTree
 from data import Vocabulary, DataManager
 from copy import deepcopy
 from typing import List
 from tqdm import tqdm
+from model import FastText
 
 
 class Processor(object):
-    def __init__(self, vocabulary: Vocabulary, batch_size: int, shuffle: bool,
-                 model: torch.nn.Module, learning_rate: float):
+    def __init__(self,
+                 batch_size: int,
+                 shuffle: bool,
+                 vocabulary: Vocabulary = None,
+                 huffman_tree: HuffmanTree = None,
+                 model: torch.nn.Module = None,
+                 optimizer: torch.optim.Optimizer = None):
         self._vocabulary = deepcopy(vocabulary)
+        self._huffman_tree = deepcopy(huffman_tree)
         self._batch_size = batch_size
         self._shuffle = shuffle
-
         self._loss = torch.nn.L1Loss()
+        self._optimizer = deepcopy(optimizer)
         self._model = deepcopy(model)
-        self._optimizer = torch.optim.Adam(
-            self._model.parameters(), lr=learning_rate)
 
     def fit(self,
             path: str,
@@ -45,10 +51,10 @@ class Processor(object):
             for current_sentences, current_labels in tqdm(package,
                                                           ncols=len(package)):
                 sentences = self._wrap_sentence(current_sentences)
-                labels = torch.Tensor(current_labels, dtype=torch.LongTensor)
+                pos_path, neg_path = self._wrap_tree_path(current_labels)
 
-                predict_labels = self._model(sentences)
-                loss = self._loss(predict_labels, labels)
+                predict_labels = self._model(sentences, pos_path, neg_path)
+                loss = self._loss(predict_labels, current_labels)
 
                 self._optimizer.zero_grad()
                 loss.backward()
@@ -112,8 +118,8 @@ class Processor(object):
         Args:
             path: path of model
         """
-        self._model.load_state_dict(torch.load(path + '.pkl'))
-        self._vocabulary.load(path + '.txt')
+        self._model = torch.load(path + '.pkl')
+        self._vocabulary.load(path + '_vocabulary.txt')
 
     def dump(self, path: str):
         """dump model and vocabulary to given path
@@ -121,10 +127,10 @@ class Processor(object):
         Args:
             path: path to be dumped
         """
-        torch.save(self._model.state_dict(), path + '.pkl')
-        self._vocabulary.dump(path + '.txt')
+        torch.save(self._model, path + '.pkl')
+        self._vocabulary.dump(path + '_vocabulary.txt')
 
-    def _wrap_sentence(self, sentences: List[List[str]]) -> List[List[int]]:
+    def _wrap_sentence(self, sentences: List[List[str]]) -> torch.Tensor:
         indexes = [[self._vocabulary.get(w) for w in s] for s in sentences]
         length = len(max(indexes, key=len))
         pad_index = self._vocabulary.get('[PAD]')
@@ -134,3 +140,19 @@ class Processor(object):
                 [pad_index for i in range((length - len(indexes)))]
 
         return torch.Tensor(indexes, dtype=torch.LongTensor)
+
+    def _wrap_tree_path(self, path: List[int]) -> torch.Tensor:
+        pos_ret = []
+        neg_ret = []
+        for x in self.path:
+            pos_nodes, neg_nodes = self._huffman_tree.get(x)
+
+            pos_current = [1 if i in pos_nodes else 0 for i in range(
+                len(self._huffman_tree))]
+            neg_current = [1 if i in neg_nodes else 0 for i in range(
+                len(self._huffman_tree))]
+
+            pos_ret.append(pos_current)
+            neg_ret.append(neg_current)
+
+        return torch.Tensor(pos_ret, dtype=torch.LongTensor), torch.Tensor(neg_ret, dtype=torch.LongTensor)

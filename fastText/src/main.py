@@ -1,5 +1,6 @@
 import torch
 from config import args
+from utils.model import FastText
 from utils.data import DataManager
 from utils.processor import Processor
 from utils.huffman import HuffmanTree
@@ -12,16 +13,29 @@ if __name__ == '__main__':
         vocabulary, count = train_data.load(args.train_data_path,
                                             args.max_length)
         valid_data.load(args.valid_data_path, args.max_length)
-
         tree = HuffmanTree(count)
 
-        processor = Processor(vocabulary, args.batch_size, True, args.lr)
+        model = FastText(vocabulary_size=len(vocabulary),
+                         embedding_dim=args.embedding_dim,
+                         dropout_rate=args.dropout_rate,
+                         tree_size=len(tree),
+                         padding_idx=vocabulary.get('[PAD]'))
+        optimizer = torch.optim.Adam(params=model.parameters(),
+                                     lr=args.learning_rate)
+
+        processor = Processor(batch_size=args.batch_size,
+                              shuffle=True,
+                              vocabulary=vocabulary,
+                              huffman_tree=tree,
+                              model=model,
+                              optimizer=optimizer)
         processor.fit(args.model_path, train_data, valid_data, args.epoch)
     elif args.mode == 'predict':
         test_data = DataManager('test')
         test_data.load(args.predict_data_path)
 
-        processor = Processor(None, args.batch_size, False, args.lr)
+        processor = Processor(batch_size=args.batch_size,
+                              shuffle=False)
         processor.load(args.model_path)
 
         pid = test_data.pids()
