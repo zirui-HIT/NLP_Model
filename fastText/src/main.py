@@ -1,6 +1,8 @@
+import torch
 from config import args
 from utils.data import DataManager
 from utils.processor import Processor
+from utils.huffman import HuffmanTree
 
 if __name__ == '__main__':
     if args.mode == 'train':
@@ -11,13 +13,15 @@ if __name__ == '__main__':
                                             args.max_length)
         valid_data.load(args.valid_data_path, args.max_length)
 
-        processor = Processor(vocabulary, args.batch_size, True)
+        tree = HuffmanTree(count)
+
+        processor = Processor(vocabulary, args.batch_size, True, args.lr)
         processor.fit(args.model_path, train_data, valid_data, args.epoch)
     elif args.mode == 'predict':
         test_data = DataManager('test')
         test_data.load(args.predict_data_path)
 
-        processor = Processor(None, args.batch_size, False)
+        processor = Processor(None, args.batch_size, False, args.lr)
         processor.load(args.model_path)
 
         pid = test_data.pids()

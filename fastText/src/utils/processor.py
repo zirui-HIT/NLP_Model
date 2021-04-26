@@ -8,14 +8,15 @@ from tqdm import tqdm
 
 class Processor(object):
     def __init__(self, vocabulary: Vocabulary, batch_size: int, shuffle: bool,
-                 model: torch.nn.Module, optimizer: torch.optim.Optimizer):
+                 model: torch.nn.Module, learning_rate: float):
         self._vocabulary = deepcopy(vocabulary)
         self._batch_size = batch_size
         self._shuffle = shuffle
 
         self._loss = torch.nn.L1Loss()
         self._model = deepcopy(model)
-        self._optimizer = deepcopy(optimizer)
+        self._optimizer = torch.optim.Adam(
+            self._model.parameters(), lr=learning_rate)
 
     def fit(self,
             path: str,
