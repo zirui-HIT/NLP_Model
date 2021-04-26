@@ -59,7 +59,7 @@ parser.add_argument('--dropout',
 
 # test mode argument
 parser.add_argument('--predict_data_path',
-                    'pdp',
+                    '-pdp',
                     type=str,
                     default='../../Data/Sentiment_Analysis_on_Movie_Reviews/test.tsv',
                     help="path of test data")
