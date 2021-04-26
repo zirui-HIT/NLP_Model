@@ -36,7 +36,7 @@ parser.add_argument('--train_data_path',
                     default='../../Data/Sentiment_Analysis_on_Movie_Reviews/train.tsv',
                     help="path of train data")
 parser.add_argument('--valid_data_path',
-                    'vdq',
+                    '-vdq',
                     type=str,
                     default='../../Data/Sentiment_Analysis_on_Movie_Reviews/valid.tsv',
                     help="path of valid data")
