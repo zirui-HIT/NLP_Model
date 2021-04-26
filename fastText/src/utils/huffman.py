@@ -50,7 +50,7 @@ class HuffmanTree(object):
     tree must have at least one node
     """
 
-    def __init__(self, labels: Dict[int, int]):
+    def __init__(self, labels: Dict[int, int] = None):
         """initialize huffman tree
 
         Args:
@@ -59,6 +59,9 @@ class HuffmanTree(object):
         self._cnt = 0
         self._num: Dict[int, int] = {}
         self._path: Dict[int, List[int]] = {}
+
+        if labels is None:
+            return
 
         nodes = PriorityQueue()
         for x in labels:
@@ -116,6 +119,76 @@ class HuffmanTree(object):
                 current = current.right_child()
 
         return pos_nodes, neg_nodes
+
+    def dump(self, path: str):
+        """dump parameters of huffman tree
+
+        Args:
+            path: path to dump parameters
+        """
+        with open(path, 'w') as f:
+            f.write(str(self._root.num()) + '\n')
+            f.write(str(self._cnt) + '\n')
+
+            rec: List[str] = ["" for i in range(self._cnt)]
+            stack: List[_Node] = [self._root]
+            while len(stack) != 0:
+                x = stack[-1]
+                stack.pop()
+
+                if x is None:
+                    continue
+
+                left_child = x.left_child()
+                right_child = x.right_child()
+                if left_child is None:
+                    left_child = _Node(-1, 0)
+                if right_child is None:
+                    right_child = _Node(-1, 0)
+
+                rec[x.num()] = "%d %d %d" % (
+                    x.weight(), left_child.num(), right_child.num())
+                stack.append(x.left_child())
+                stack.append(x.right_child())
+            for s in rec:
+                f.write(s + '\n')
+
+            for label in self._num:
+                f.write("%s %d\n" % (label, self._num[label]))
+
+    def load(self, path: str):
+        """load parameters from given file
+
+        Args:
+            path: path of parameters
+        """
+        nodes = {}
+        nodes[-1] = None
+        childs = []
+        with open(path, 'r') as f:
+            line_count = 0
+            for line in f:
+                current = line.strip()
+
+                if line_count == 0:
+                    self._root = int(current)
+                elif line_count == 1:
+                    self._cnt = int(current)
+                elif line_count <= self._cnt + 1:
+                    param = current.split()
+                    cnt = line_count - 2
+                    nodes[cnt] = _Node(cnt, int(param[0]))
+                    childs.append(
+                        [cnt, int(param[1]), int(param[2])])
+                else:
+                    param = current.split()
+                    self._num[int(param[0])] = int(param[1])
+                line_count += 1
+
+        for p in childs:
+            par = nodes[p[0]]
+            par.add_child(0, nodes[p[1]])
+            par.add_child(1, nodes[p[2]])
 
     def __len__(self):
         return self._cnt

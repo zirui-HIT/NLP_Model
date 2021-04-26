@@ -119,7 +119,10 @@ class Processor(object):
             path: path of model
         """
         self._model = torch.load(path + '.pkl')
+        self._vocabulary = Vocabulary()
         self._vocabulary.load(path + '_vocabulary.txt')
+        self._huffman_tree = HuffmanTree()
+        self._huffman_tree.load(path + 'huffman_tree.txt')
 
     def dump(self, path: str):
         """dump model and vocabulary to given path
@@ -129,6 +132,7 @@ class Processor(object):
         """
         torch.save(self._model, path + '.pkl')
         self._vocabulary.dump(path + '_vocabulary.txt')
+        self._huffman_tree.dump(path + '_huffman_tree.txt')
 
     def _wrap_sentence(self, sentences: List[List[str]]) -> torch.Tensor:
         indexes = [[self._vocabulary.get(w) for w in s] for s in sentences]
