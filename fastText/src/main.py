@@ -20,6 +20,8 @@ if __name__ == '__main__':
                          dropout_rate=args.dropout_rate,
                          tree_size=len(tree),
                          padding_idx=vocabulary.get('[PAD]'))
+        if torch.cuda.is_available():
+            model = model.cuda()
         optimizer = torch.optim.Adam(params=model.parameters(),
                                      lr=args.learning_rate)
 

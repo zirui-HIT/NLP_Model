@@ -48,6 +48,8 @@ class FastText(torch.nn.Module):
 
             # [batch_size, 1]
             ones = torch.ones(trans.size(), requires_grad=True)
+            if torch.cuda.is_available():
+                ones = ones.cuda()
             log_likehood = torch.mul(tree_pos_path, trans) + torch.mul(
                 tree_neg_path, torch.sub(ones, trans))
 

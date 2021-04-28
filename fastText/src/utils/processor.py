@@ -20,9 +20,12 @@ class Processor(object):
         self._huffman_tree = deepcopy(huffman_tree)
         self._batch_size = batch_size
         self._shuffle = shuffle
-        self._loss = torch.nn.L1Loss()
         self._optimizer = optimizer
         self._model = model
+
+        self._loss = torch.nn.L1Loss()
+        if torch.cuda.is_available():
+            self._loss = self._loss.cuda()
 
     def fit(self,
             path: str,
@@ -48,13 +51,17 @@ class Processor(object):
         best_accuracy = 0
         package = train_data.package(self._batch_size, self._shuffle)
         for e in range(epoch):
-            for current_sentences, current_labels in tqdm(package,
-                                                          ncols=len(package)):
+            for current_sentences, current_labels in tqdm(package):
                 sentences = self._wrap_sentence(current_sentences)
                 pos_path, neg_path = self._wrap_tree_path(current_labels)
+                ones = torch.ones([len(current_sentences)], requires_grad=True)
+                if torch.cuda.is_available():
+                    sentences = sentences.cuda()
+                    pos_path = pos_path.cuda()
+                    neg_path = neg_path.cuda()
+                    ones = ones.cuda()
 
                 probability = self._model(sentences, pos_path, neg_path)
-                ones = torch.ones(probability.size(), requires_grad=True)
                 loss = self._loss(probability, ones)
 
                 self._optimizer.zero_grad()
