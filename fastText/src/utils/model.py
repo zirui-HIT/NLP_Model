@@ -47,11 +47,12 @@ class FastText(torch.nn.Module):
             trans = torch.sigmoid(self._tree_param(feature))
 
             # [batch_size, 1]
-            ones = torch.full(trans.shape(), 1)
+            ones = torch.ones(trans.size(), requires_grad=True)
             log_likehood = torch.mul(tree_pos_path, trans) + torch.mul(
                 tree_neg_path, torch.sub(ones, trans))
 
-            return log_likehood
+            ret = torch.sum(log_likehood, dim=1)
+            return ret
         else:
             # TODO
             pass

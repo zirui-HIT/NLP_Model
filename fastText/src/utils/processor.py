@@ -21,8 +21,8 @@ class Processor(object):
         self._batch_size = batch_size
         self._shuffle = shuffle
         self._loss = torch.nn.L1Loss()
-        self._optimizer = deepcopy(optimizer)
-        self._model = deepcopy(model)
+        self._optimizer = optimizer
+        self._model = model
 
     def fit(self,
             path: str,
@@ -53,17 +53,20 @@ class Processor(object):
                 sentences = self._wrap_sentence(current_sentences)
                 pos_path, neg_path = self._wrap_tree_path(current_labels)
 
-                predict_labels = self._model(sentences, pos_path, neg_path)
-                loss = self._loss(predict_labels, current_labels)
+                probability = self._model(sentences, pos_path, neg_path)
+                ones = torch.ones(probability.size(), requires_grad=True)
+                loss = self._loss(probability, ones)
 
                 self._optimizer.zero_grad()
                 loss.backward()
                 self._optimizer.step()
 
+            """
             if self.validate(valid_data) > best_accuracy:
                 self.dump(path)
+            """
 
-            print("epoch %d best accuracy: %f" % (e, best_accuracy))
+            print("epoch %d's loss is %f" % (e, loss.item()))
 
     def validate(self, data: DataManager) -> float:
         """validate model
@@ -136,19 +139,19 @@ class Processor(object):
 
     def _wrap_sentence(self, sentences: List[List[str]]) -> torch.Tensor:
         indexes = [[self._vocabulary.get(w) for w in s] for s in sentences]
-        length = len(max(indexes, key=len))
+        length = len(max(sentences, key=len))
         pad_index = self._vocabulary.get('[PAD]')
 
         for i in range(len(indexes)):
             indexes[i] = indexes[i] + \
-                [pad_index for i in range((length - len(indexes)))]
+                [pad_index for i in range((length - len(indexes[i])))]
 
-        return torch.Tensor(indexes, dtype=torch.LongTensor)
+        return torch.LongTensor(indexes)
 
     def _wrap_tree_path(self, path: List[int]) -> torch.Tensor:
         pos_ret = []
         neg_ret = []
-        for x in self.path:
+        for x in path:
             pos_nodes, neg_nodes = self._huffman_tree.get(x)
 
             pos_current = [1 if i in pos_nodes else 0 for i in range(
@@ -159,4 +162,4 @@ class Processor(object):
             pos_ret.append(pos_current)
             neg_ret.append(neg_current)
 
-        return torch.Tensor(pos_ret, dtype=torch.LongTensor), torch.Tensor(neg_ret, dtype=torch.LongTensor)
+        return torch.LongTensor(pos_ret), torch.LongTensor(neg_ret)

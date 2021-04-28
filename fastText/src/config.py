@@ -48,7 +48,7 @@ parser.add_argument('--epoch',
 parser.add_argument('--learning_rate',
                     '-lr',
                     type=float,
-                    default=1e-5,
+                    default=1e-2,
                     help="learing rate")
 parser.add_argument('--dropout_rate',
                     '-dr',

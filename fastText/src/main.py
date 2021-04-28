@@ -24,7 +24,7 @@ if __name__ == '__main__':
                                      lr=args.learning_rate)
 
         processor = Processor(batch_size=args.batch_size,
-                              shuffle=True,
+                              shuffle=False,
                               vocabulary=vocabulary,
                               huffman_tree=tree,
                               model=model,
