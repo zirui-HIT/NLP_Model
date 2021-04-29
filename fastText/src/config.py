@@ -11,7 +11,7 @@ parser.add_argument('--random_seed',
 parser.add_argument('--mode',
                     '-m',
                     type=str,
-                    default='train',
+                    default='predict',
                     help="train model or predict result")
 parser.add_argument('--model_path',
                     '-mp',
@@ -21,12 +21,12 @@ parser.add_argument('--model_path',
 parser.add_argument('--max_length',
                     '-ml',
                     type=int,
-                    default=10,
+                    default=None,
                     help="max length to be processed")
 parser.add_argument('--batch_size',
                     '-bs',
                     type=int,
-                    default=4,
+                    default=64,
                     help="batch size")
 
 # train mode argument
@@ -43,12 +43,12 @@ parser.add_argument('--valid_data_path',
 parser.add_argument('--epoch',
                     '-e',
                     type=int,
-                    default=20,
+                    default=50,
                     help="epoch")
 parser.add_argument('--learning_rate',
                     '-lr',
                     type=float,
-                    default=1e-2,
+                    default=1e-5,
                     help="learing rate")
 parser.add_argument('--dropout_rate',
                     '-dr',

@@ -57,7 +57,8 @@ class HuffmanTree(object):
             labels: maps from label to occurrence time
         """
         self._cnt = 0
-        self._num: Dict[int, int] = {}
+        self._label2num: Dict[int, int] = {}
+        self._num2label: Dict[int, int] = {}
         self._path: Dict[int, List[int]] = {}
 
         if labels is None:
@@ -65,7 +66,8 @@ class HuffmanTree(object):
 
         nodes = PriorityQueue()
         for x in labels:
-            self._num[x] = self._cnt
+            self._label2num[x] = self._cnt
+            self._num2label[self._cnt] = x
             nodes.put(_Node(self._cnt, labels[x]))
             self._cnt += 1
 
@@ -109,16 +111,40 @@ class HuffmanTree(object):
         neg_nodes = []
         current = self._root
 
-        for i in range(1, len(self._path[self._num[label]])):
-            x = self._path[self._num[label]][i]
+        for i in range(1, len(self._path[self._label2num[label]])):
+            x = self._path[self._label2num[label]][i]
             if current.left_child().num() == x:
-                pos_nodes.append(self._path[self._num[label]][i-1])
+                pos_nodes.append(self._path[self._label2num[label]][i-1])
                 current = current.left_child()
             else:
-                neg_nodes.append(self._path[self._num[label]][i-1])
+                neg_nodes.append(self._path[self._label2num[label]][i-1])
                 current = current.right_child()
 
         return pos_nodes, neg_nodes
+
+    def find(self, probability: List[float]) -> int:
+        """get node following given path
+
+        Args:
+            probability: probability of getting left child on every node
+
+        Returns:
+            end label of path
+        """
+        current: _Node = self._root
+        while True:
+            current_num = current.num()
+            if probability[current_num] >= 0.5:
+                child = current.left_child()
+            else:
+                child = current.right_child()
+
+            if child is None:
+                if current_num in self._num2label:
+                    return self._num2label[current_num]
+                else:
+                    return -1
+            current = child
 
     def dump(self, path: str):
         """dump parameters of huffman tree
@@ -153,8 +179,8 @@ class HuffmanTree(object):
             for s in rec:
                 f.write(s + '\n')
 
-            for label in self._num:
-                f.write("%s %d\n" % (label, self._num[label]))
+            for label in self._label2num:
+                f.write("%s %d\n" % (label, self._label2num[label]))
 
     def load(self, path: str):
         """load parameters from given file
@@ -182,7 +208,8 @@ class HuffmanTree(object):
                         [cnt, int(param[1]), int(param[2])])
                 else:
                     param = current.split()
-                    self._num[int(param[0])] = int(param[1])
+                    self._label2num[int(param[0])] = int(param[1])
+                    self._num2label[int(param[1])] = int(param[0])
                 line_count += 1
 
         for p in childs:

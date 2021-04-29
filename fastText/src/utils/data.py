@@ -10,6 +10,7 @@ class Vocabulary(object):
 
     Attributes:
     """
+
     def __init__(self):
         """Instantiate vocabulary
         """
@@ -17,7 +18,7 @@ class Vocabulary(object):
         self._index2word: Dict[int, str] = {}
         self._word2index: Dict[str, int] = {}
 
-        self.append(['[BOS]', '[EOS]', '[SEP]', '[PAD]'])
+        self.append(['[BOS]', '[EOS]', '[PAD]'])
 
     def append(self, words: List[str]):
         """Append words to vocabulary
@@ -47,7 +48,7 @@ class Vocabulary(object):
         """
         if isinstance(key, str):
             if not (key in self._word2index):
-                return self._word2index['SEP']
+                return self._word2index['[PAD]']
             return self._word2index[key]
         else:
             return self._index2word[key]
@@ -102,6 +103,7 @@ class Vocabulary(object):
 class Sentence(object):
     """Record sentence info
     """
+
     def __init__(self, words: List[str], label: int, pid: int):
         """Instantiate sentence
 
@@ -148,6 +150,7 @@ class Sentence(object):
 class DataManager(object):
     """Record all items of data
     """
+
     def __init__(self, mode: str):
         """Instantiate dataset
 

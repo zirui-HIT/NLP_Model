@@ -77,12 +77,11 @@ class Processor(object):
                 loss.backward()
                 self._optimizer.step()
 
-            """
-            if self.validate(valid_data) > best_accuracy:
+            current_accuracy = self.validate(valid_data)
+            if current_accuracy > best_accuracy:
                 self.dump(path)
-            """
-
-            print("epoch %d's loss is %f" % (e, loss.item()))
+                best_accuracy = current_accuracy
+            print("epoch %d's best accuracy is %f, loss is %f" % (e, best_accuracy, loss.item()))
 
     def validate(self, data: DataManager) -> float:
         """validate model
@@ -122,12 +121,18 @@ class Processor(object):
 
         package = data.package(self._batch_size, False)
         result_labels = []
-        for current_sentences in tqdm(package, ncols=len(package)):
-            sentences, mask = self._wrap_sentence(current_sentences)
+        for current_sentences in tqdm(package):
+            if len(current_sentences) > 1:
+                current_sentences = current_sentences[0]
 
-            predict_labels = self._model(sentences, mask)
-            _, predict_labels = predict_labels.topk(1, dim=1)
-            result_labels.extend(predict_labels)
+            sentences = self._wrap_sentence(current_sentences)
+            if torch.cuda.is_available():
+                sentences = sentences.cuda()
+
+            probability = self._model(sentences)
+
+            probability = probability.cpu().detach().numpy().tolist()
+            result_labels.extend(self._find_nodes(probability))
 
         return result_labels
 
@@ -179,3 +184,7 @@ class Processor(object):
             neg_ret.append(neg_current)
 
         return torch.LongTensor(pos_ret), torch.LongTensor(neg_ret)
+
+    def _find_nodes(self, probability: List[List[float]]) -> List[int]:
+        ret = [self._huffman_tree.find(p) for p in probability]
+        return ret
