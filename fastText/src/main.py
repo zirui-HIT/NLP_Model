@@ -1,3 +1,4 @@
+import os
 import torch
 from config import args
 from utils.model import FastText
@@ -15,11 +16,14 @@ if __name__ == '__main__':
         valid_data.load(args.valid_data_path, args.max_length)
         tree = HuffmanTree(count)
 
-        model = FastText(vocabulary_size=len(vocabulary),
-                         embedding_dim=args.embedding_dim,
-                         dropout_rate=args.dropout_rate,
-                         tree_size=len(tree),
-                         padding_idx=vocabulary.get('[PAD]'))
+        if os.path.isfile(args.model_path + '.pkl'):
+            model = torch.load(args.model_path + '.pkl')
+        else:
+            model = FastText(vocabulary_size=len(vocabulary),
+                             embedding_dim=args.embedding_dim,
+                             dropout_rate=args.dropout_rate,
+                             tree_size=len(tree),
+                             padding_idx=vocabulary.get('[PAD]'))
         if torch.cuda.is_available():
             model = model.cuda()
         optimizer = torch.optim.Adam(params=model.parameters(),
