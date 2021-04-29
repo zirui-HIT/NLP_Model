@@ -54,15 +54,24 @@ class Processor(object):
             for current_sentences, current_labels in tqdm(package):
                 sentences = self._wrap_sentence(current_sentences)
                 pos_path, neg_path = self._wrap_tree_path(current_labels)
-                ones = torch.ones([len(current_sentences)], requires_grad=True)
+                ones = torch.ones([len(current_sentences), len(
+                    self._huffman_tree)], requires_grad=True)
                 if torch.cuda.is_available():
                     sentences = sentences.cuda()
                     pos_path = pos_path.cuda()
                     neg_path = neg_path.cuda()
                     ones = ones.cuda()
 
-                probability = self._model(sentences, pos_path, neg_path)
-                loss = self._loss(probability, ones)
+                probability = self._model(sentences)
+                log_likehood = torch.mul(pos_path, torch.log(
+                    probability)) + torch.mul(neg_path, torch.log(torch.sub(ones, probability)))
+                log_likehood = torch.sum(log_likehood, dim=1)
+
+                zeros = torch.zeros(
+                    [len(current_sentences)], requires_grad=True)
+                if torch.cuda.is_available():
+                    zeros = zeros.cuda()
+                loss = self._loss(log_likehood, zeros)
 
                 self._optimizer.zero_grad()
                 loss.backward()

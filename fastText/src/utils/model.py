@@ -23,38 +23,19 @@ class FastText(torch.nn.Module):
                                            out_features=tree_size)
 
     def forward(self,
-                pieces: torch.Tensor,
-                tree_pos_path: torch.Tensor = None,
-                tree_neg_path: torch.Tensor = None):
+                pieces: torch.Tensor):
         """calc log likelihood of path
 
         Args:
             pieces: sentences which have been indexed
-            tree_pos_path: 0/1 vector which means label passes left child of node
-            tree_neg_path: 0/1 vector which means label passes right child of node
 
         Returns:
-            log likelihood of sentences follow given path
+            probability of taking left child on every node
         """
-        # [batch_size, sentence_length, embedding_dim]
         embed = self._embedding(pieces)
 
-        # [batch_size, embedding_dim]
         feature = torch.sum(embed, dim=1)
 
-        if not (tree_pos_path is None or tree_neg_path is None):
-            # [batch_size, tree_size]
-            trans = torch.sigmoid(self._tree_param(feature))
+        trans = torch.sigmoid(self._tree_param(feature))
 
-            # [batch_size, 1]
-            ones = torch.ones(trans.size(), requires_grad=True)
-            if torch.cuda.is_available():
-                ones = ones.cuda()
-            log_likehood = torch.mul(tree_pos_path, trans) + torch.mul(
-                tree_neg_path, torch.sub(ones, trans))
-
-            ret = torch.sum(log_likehood, dim=1)
-            return ret
-        else:
-            # TODO
-            pass
+        return trans

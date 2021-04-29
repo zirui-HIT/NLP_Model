@@ -21,12 +21,12 @@ parser.add_argument('--model_path',
 parser.add_argument('--max_length',
                     '-ml',
                     type=int,
-                    default=None,
+                    default=10,
                     help="max length to be processed")
 parser.add_argument('--batch_size',
                     '-bs',
                     type=int,
-                    default=32,
+                    default=4,
                     help="batch size")
 
 # train mode argument
