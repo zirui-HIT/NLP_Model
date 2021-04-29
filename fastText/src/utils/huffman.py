@@ -216,6 +216,7 @@ class HuffmanTree(object):
             par = nodes[p[0]]
             par.add_child(0, nodes[p[1]])
             par.add_child(1, nodes[p[2]])
+        self._root = nodes[self._root]
 
     def __len__(self):
         return self._cnt
