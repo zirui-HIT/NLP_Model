@@ -33,12 +33,12 @@ parser.add_argument('--batch_size',
 parser.add_argument('--train_data_path',
                     '-tdp',
                     type=str,
-                    default='Data/Sentiment_Analysis_on_Movie_Reviews/train.tsv',
+                    default='Data/Sentiment_Analysis/train.tsv',
                     help="path of train data")
 parser.add_argument('--valid_data_path',
                     '-vdq',
                     type=str,
-                    default='Data/Sentiment_Analysis_on_Movie_Reviews/valid.tsv',
+                    default='Data/Sentiment_Analysis/valid.tsv',
                     help="path of valid data")
 parser.add_argument('--epoch',
                     '-e',
@@ -66,12 +66,12 @@ parser.add_argument('--embedding_dim',
 parser.add_argument('--predict_data_path',
                     '-pdp',
                     type=str,
-                    default='Data/Sentiment_Analysis_on_Movie_Reviews/test.tsv',
+                    default='Data/Sentiment_Analysis/test.tsv',
                     help="path of test data")
 parser.add_argument('--save_path',
                     '-sp',
                     type=str,
-                    default='Data/Sentiment_Analysis_on_Movie_Reviews/result_fastText.tsv',
+                    default='Data/Sentiment_Analysis/result_fastText.tsv',
                     help="output path")
 
 args = parser.parse_args()
