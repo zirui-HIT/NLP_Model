@@ -34,7 +34,7 @@ if __name__ == '__main__':
         processor.fit(args.model_path, train_data, valid_data, args.epoch)
     elif args.mode == 'predict':
         test_data = DataManager('test')
-        test_data.load(args.predict_data_path)
+        test_data.load(args.predict_data_path, args.max_length)
 
         processor = Processor(batch_size=args.batch_size,
                               shuffle=False)
