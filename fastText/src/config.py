@@ -43,7 +43,7 @@ parser.add_argument('--valid_data_path',
 parser.add_argument('--epoch',
                     '-e',
                     type=int,
-                    default=50,
+                    default=60,
                     help="epoch")
 parser.add_argument('--learning_rate',
                     '-lr',

@@ -26,7 +26,7 @@ if __name__ == '__main__':
                                      lr=args.learning_rate)
 
         processor = Processor(batch_size=args.batch_size,
-                              shuffle=False,
+                              shuffle=True,
                               vocabulary=vocabulary,
                               huffman_tree=tree,
                               model=model,
@@ -46,7 +46,6 @@ if __name__ == '__main__':
         import pandas as pd
         out = []
         for i in range(len(pid)):
-            out.append({'PhraseId: %d, Sentiment: %d'} %
-                       (pid[i], predict_labels[i]))
+            out.append({'PhraseId': pid[i], 'Sentiment': predict_labels[i]})
         out = pd.DataFrame(out, columns=['PhraseId', 'Sentiment'])
         out.to_csv(args.save_path, index=False)

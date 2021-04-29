@@ -121,10 +121,7 @@ class Processor(object):
 
         package = data.package(self._batch_size, False)
         result_labels = []
-        for current_sentences in tqdm(package):
-            if len(current_sentences) > 1:
-                current_sentences = current_sentences[0]
-
+        for current_sentences, current_labels in tqdm(package):
             sentences = self._wrap_sentence(current_sentences)
             if torch.cuda.is_available():
                 sentences = sentences.cuda()
@@ -146,7 +143,7 @@ class Processor(object):
         self._vocabulary = Vocabulary()
         self._vocabulary.load(path + '_vocabulary.txt')
         self._huffman_tree = HuffmanTree()
-        self._huffman_tree.load(path + 'huffman_tree.txt')
+        self._huffman_tree.load(path + '_huffman_tree.txt')
 
     def dump(self, path: str):
         """dump model and vocabulary to given path

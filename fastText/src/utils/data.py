@@ -180,21 +180,33 @@ class DataManager(object):
         if max_length is None:
             max_length = len(data)
 
-        for i in range(len(data)):
-            if i >= max_length:
-                break
+        if self._mode == 'train' or self._mode == 'valid':
+            for i in range(len(data)):
+                if i >= max_length:
+                    break
 
-            words = data['Phrase'][i].split()
-            words = ['<BOS>'] + words + ['<EOS>']
-            label = data['Sentiment'][i]
+                words = data['Phrase'][i].split()
+                words = ['<BOS>'] + words + ['<EOS>']
+                label = data['Sentiment'][i]
 
-            self._sentences.append(Sentence(words, label, data['PhraseId'][i]))
-            if not (label in count):
-                count[label] = 0
-            count[label] += 1
-            vocabulary.append(words)
+                self._sentences.append(
+                    Sentence(words, label, data['PhraseId'][i]))
+                if not (label in count):
+                    count[label] = 0
+                count[label] += 1
+                vocabulary.append(words)
 
-        return vocabulary, count
+            return vocabulary, count
+        else:
+            for i in range(len(data)):
+                if i >= max_length:
+                    break
+
+                words = data['Phrase'][i].split()
+                words = ['<BOS>'] + words + ['<EOS>']
+                label = ''
+                self._sentences.append(
+                    Sentence(words, label, data['PhraseId'][i]))
 
     def package(self, batch_size: int, shuffle: bool = False):
         """package data
