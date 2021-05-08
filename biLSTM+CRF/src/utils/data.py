@@ -9,6 +9,7 @@ class Vocabulary(object):
 
     Attributes:
     """
+
     def __init__(self):
         """Instantiate vocabulary
         """
@@ -144,6 +145,9 @@ class DataManager(object):
                 current_words.append(words[0])
                 if self._mode != 'test':
                     current_labels.append(words[3])
+
+        if self._mode == 'train':
+            return word_vocabulary, label_vocabulary
 
     def package(self, batch_size: int, shuffle: bool = True):
         words = []
