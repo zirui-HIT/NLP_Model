@@ -18,8 +18,6 @@ class Vocabulary(object):
         self._index2word: Dict[int, str] = {}
         self._word2index: Dict[str, int] = {}
 
-        self.append(['[BOS]', '[EOS]', '[PAD]'])
-
     def append(self, words: List[str]):
         """Append words to vocabulary
 

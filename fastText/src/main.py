@@ -13,6 +13,7 @@ if __name__ == '__main__':
 
         vocabulary, count = train_data.load(args.train_data_path,
                                             args.max_length)
+        vocabulary.append(['<PAD>', '<BOS>', '<EOS>'])
         valid_data.load(args.valid_data_path, args.max_length)
         tree = HuffmanTree(count)
 
@@ -40,8 +41,7 @@ if __name__ == '__main__':
         test_data = DataManager('test')
         test_data.load(args.predict_data_path, args.max_length)
 
-        processor = Processor(batch_size=args.batch_size,
-                              shuffle=False)
+        processor = Processor(batch_size=args.batch_size, shuffle=False)
         processor.load(args.model_path)
 
         pid = test_data.pids()
