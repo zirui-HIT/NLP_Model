@@ -72,13 +72,14 @@ class biLstmCrf(torch.nn.Module):
                         sum_score.unsqueeze(1).expand(label_dim, label_dim) +
                         transition + emission[i][j].unsqueeze(0).expand(
                             label_dim, label_dim))
+                sum_score = torch.sum(sum_score)
 
-                probability[i] = real_score / sum_score
+                probability[i] = sum_score - real_score
 
             return probability
 
 
 def _log_sum_exp(score):
     max_value = torch.max(score)
-    return max_value + torch.log(torch.sum(torch.exp(score - max_value),
-                                           dim=1))
+    return max_value + torch.log(
+        torch.sum(torch.exp(score - max_value), dim=-1))
