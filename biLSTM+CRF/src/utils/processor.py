@@ -17,7 +17,6 @@ class Processor(object):
         self._model = model
 
     def fit(self,
-            shuffle: bool,
             optimizer: torch.optim.Optimizer,
             epoch: int,
             path: str,
@@ -28,7 +27,7 @@ class Processor(object):
             valid_data = train_data
 
         best_acc = 0
-        package = train_data.package(self._batch_size, shuffle)
+        package = train_data.package(self._batch_size, True)
         for e in range(epoch):
             loss_sum = 0
             for current_sentences, current_labels in tqdm(package):
