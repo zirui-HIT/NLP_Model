@@ -39,13 +39,13 @@ class Processor(object):
                 loss.backward()
                 optimizer.step()
 
-            print("epoch %d: loss is %f, best_acc is %f" %
-                  (e, loss_sum, best_acc))
-
             valid_acc = self.validate(valid_data)
             if valid_acc > best_acc:
-                best_acc = valid_data
+                best_acc = valid_acc
                 self.dump(path)
+
+            print("epoch %d: loss is %f, best_acc is %.4f%%" %
+                  (e, loss_sum, best_acc * 100))
 
     def validate(self, data: DataManager):
         predicte_labels: List[List[int]] = self.predicte(data)
@@ -78,7 +78,7 @@ class Processor(object):
                 for i in range(len(predict_labels))
             ]
 
-        ret = [[self._label_vocabulary[x] for x in s] for s in ret]
+        ret = [[self._label_vocabulary[int(x)] for x in s] for s in ret]
         return ret
 
     def dump(self, path: str):
@@ -109,9 +109,7 @@ class Processor(object):
             ]
             packed_sentences.append(current_sentence)
 
-        length = torch.LongTensor(length)
         packed_sentences = torch.LongTensor(packed_sentences)
-
         if labels is None:
             return packed_sentences, length
 
@@ -125,5 +123,4 @@ class Processor(object):
             ]
             packed_labels.append(current_label)
 
-        packed_labels = torch.LongTensor(packed_labels)
         return packed_sentences, packed_labels, length

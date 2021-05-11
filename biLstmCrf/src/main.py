@@ -23,20 +23,21 @@ if __name__ == '__main__':
 
         word_vocabulary.append(['[BOS]', '[EOS]'])
         label_vocabulary.append(['[BOL]', '[EOL]'])
-
+        '''
         if os.path.isfile(args.model_path + '.pkl'):
             model = torch.load(args.model_path + '.pkl')
         else:
-            model = biLstmCrf(vocabulary_size=len(word_vocabulary),
-                              embedding_dim=args.embedding_dim,
-                              hidden_dim=args.hidden_dim,
-                              label_dim=len(label_vocabulary),
-                              dropout=args.dropout_rate,
-                              padding_idx=word_vocabulary['[PAD]'],
-                              begin_idx=label_vocabulary['[BOL]'],
-                              end_idx=label_vocabulary['[EOL]'])
-            if torch.cuda.is_available():
-                model = model.cuda()
+        '''
+        model = biLstmCrf(vocabulary_size=len(word_vocabulary),
+                          embedding_dim=args.embedding_dim,
+                          hidden_dim=args.hidden_dim,
+                          label_dim=len(label_vocabulary),
+                          dropout=args.dropout_rate,
+                          padding_idx=word_vocabulary['[PAD]'],
+                          begin_idx=label_vocabulary['[BOL]'],
+                          end_idx=label_vocabulary['[EOL]'])
+        if torch.cuda.is_available():
+            model = model.cuda()
 
         processor = Processor(batch_size=args.batch_size,
                               word_vocabulary=word_vocabulary,

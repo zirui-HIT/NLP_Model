@@ -16,27 +16,27 @@ parser.add_argument('--mode',
 parser.add_argument('--model_path',
                     '-mp',
                     type=str,
-                    default='biLSTM+CRF/model/biLSTM+CRF',
+                    default='biLstmCrf/model/biLstmCrf',
                     help="path to save model")
 parser.add_argument('--max_length',
                     '-ml',
                     type=int,
-                    default=16,
+                    default=128,
                     help="max length to be processed")
 parser.add_argument('--batch_size',
                     '-bs',
                     type=int,
-                    default=4,
+                    default=16,
                     help="batch size")
 parser.add_argument('--embedding_dim',
                     '-ed',
                     type=int,
-                    default=4,
+                    default=16,
                     help='dimension of embedding layer')
 parser.add_argument('--hidden_dim',
                     '-hd',
                     type=int,
-                    default=4,
+                    default=16,
                     help='dimension of hidden layer')
 
 # train mode argument
@@ -54,7 +54,7 @@ parser.add_argument('--epoch', '-e', type=int, default=20, help="epoch")
 parser.add_argument('--learning_rate',
                     '-lr',
                     type=float,
-                    default=1e-4,
+                    default=1e-2,
                     help="learning rate")
 parser.add_argument('--dropout_rate',
                     '-dr',
@@ -72,7 +72,7 @@ parser.add_argument(
     '--save_path',
     '-sp',
     type=str,
-    default='Data/Named_Entity_Recognition/result_biLSTM+CRF.tsv',
+    default='Data/Named_Entity_Recognition/result_biLstmCrf.tsv',
     help="output path")
 
 args = parser.parse_args()

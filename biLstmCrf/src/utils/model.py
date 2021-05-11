@@ -1,5 +1,4 @@
 import torch
-from copy import deepcopy
 from typing import List
 
 
@@ -37,7 +36,7 @@ class biLstmCrf(torch.nn.Module):
 
         size = list(x.size())
         batch_size = size[0]
-        label_dim = size[1]
+        label_dim = size[2]
         if labels is None:
             best_point = torch.zeros_like(emission)
             path = torch.zeros_like(tokens)
@@ -48,25 +47,25 @@ class biLstmCrf(torch.nn.Module):
                         best_point[i][j][k] = torch.argmax(alpha +
                                                            (transition.T)[k])
                     for k in range(label_dim):
-                        alpha[k] = (alpha +
-                                    (transition.T)[k])[best_point[i][j][k]]
+                        alpha[k] = (alpha + (transition.T)[k])[int(
+                            best_point[i][j][k])]
 
                 path[i][length[i] - 1] = self._end_idx
-                for j in range(length[i] - 2, -1, 0):
-                    path[i][j] = best_point[i][j + 1][path[i][j + 1]]
+                for j in range(length[i] - 2, 0, -1):
+                    path[i][j] = int(best_point[i][j + 1][path[i][j + 1]])
                 path[i][0] = self._begin_idx
 
             return path
         else:
             neg_log_probability = torch.FloatTensor(batch_size)
             for i in range(batch_size):
-                real_score = torch.FloatTensor()
+                real_score = torch.tensor(0.0)
                 for j in range(length[i]):
                     real_score += emission[i][j][labels[i][j]]
                 for j in range(1, length[i]):
                     real_score += transition[labels[i][j - 1]][labels[i][j]]
 
-                sum_score = emission[i][0]
+                sum_score = torch.clone(emission[i][0])
                 for j in range(1, length[i]):
                     sum_score = _log_sum_exp(
                         sum_score.unsqueeze(1).expand(label_dim, label_dim) +
@@ -76,7 +75,7 @@ class biLstmCrf(torch.nn.Module):
 
                 neg_log_probability[i] = sum_score - real_score
 
-            return neg_log_probability
+            return torch.sum(neg_log_probability)
 
 
 def _log_sum_exp(score):
