@@ -18,7 +18,6 @@ class Processor(object):
 
     def fit(self,
             shuffle: bool,
-            dropout: float,
             optimizer: torch.optim.Optimizer,
             epoch: int,
             path: str,
