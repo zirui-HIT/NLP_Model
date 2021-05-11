@@ -9,13 +9,14 @@ class Vocabulary(object):
 
     Attributes:
     """
-
     def __init__(self):
         """Instantiate vocabulary
         """
         self._word_count = 0
         self._index2word: Dict[int, str] = {}
         self._word2index: Dict[str, int] = {}
+
+        self.append(['[PAD]', '[UNK]'])
 
     def append(self, words: List[str]):
         """Append words to vocabulary
