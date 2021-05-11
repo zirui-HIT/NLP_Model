@@ -73,7 +73,7 @@ class Processor(object):
         for current_sentences, current_labels in tqdm(package):
             packed_sentences, length = self._wrap_sentence(current_sentences)
 
-            predict_labels = list(self._model(current_sentences, length))
+            predict_labels = list(self._model(packed_sentences, length))
             ret = ret + [
                 predict_labels[i][:length[i]]
                 for i in range(len(predict_labels))
