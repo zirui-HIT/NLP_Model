@@ -13,7 +13,7 @@ class biLstmCrf(torch.nn.Module):
                                              embedding_dim=embedding_dim,
                                              padding_idx=padding_idx)
         self._lstm = torch.nn.LSTM(input_size=embedding_dim,
-                                   hidden_size=label_dim,
+                                   hidden_size=hidden_dim,
                                    dropout=dropout,
                                    bidirectional=True,
                                    batch_first=True)
@@ -66,7 +66,7 @@ class biLstmCrf(torch.nn.Module):
                 for j in range(1, length[i]):
                     real_score += transition[labels[i][j - 1]][labels[i][j]]
 
-                sum_score = deepcopy(emission[i][0])
+                sum_score = emission[i][0]
                 for j in range(1, length[i]):
                     sum_score = _log_sum_exp(
                         sum_score.unsqueeze(1).expand(label_dim, label_dim) +

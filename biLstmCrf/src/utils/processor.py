@@ -1,8 +1,7 @@
 import torch
-import numpy as np
 from tqdm import tqdm
 from typing import List
-from biLstmCrf.src.utils.data import Vocabulary, DataManager
+from utils.data import Vocabulary, DataManager
 
 
 class Processor(object):
@@ -94,23 +93,24 @@ class Processor(object):
         self._label_vocabulary.load(path + '_slot_vocabulary.txt')
         self._word_vocabulary.load(path + '_word_vocabulary.txt')
 
-    def _warp_sentence(self,
+    def _wrap_sentence(self,
                        sentences: List[List[str]],
                        labels: List[List[str]] = None):
         length = [2 + len(s) for s in sentences]
-        max_length = len(length)
+        max_length = max(length)
 
         packed_sentences = []
         for i in range(len(sentences)):
             sentence = ['[BOS]'] + sentences[i] + ['[EOS]']
-            current_sentence = [self._word_vocabulary(w) for w in sentence]
-            packed_sentences.append(current_sentence + [
+            current_sentence = [self._word_vocabulary[w] for w in sentence]
+            current_sentence += [
                 self._word_vocabulary['[PAD]']
                 for i in range(max_length - length[i])
-            ])
+            ]
+            packed_sentences.append(current_sentence)
 
         length = torch.LongTensor(length)
-        packed_sentences = torch.LongTensor(length)
+        packed_sentences = torch.LongTensor(packed_sentences)
 
         if labels is None:
             return packed_sentences, length
@@ -118,11 +118,12 @@ class Processor(object):
         packed_labels = []
         for i in range(len(labels)):
             label = ['[BOL]'] + labels[i] + ['[EOL]']
-            current_label = [self._label_vocabulary(l) for l in label]
-            packed_labels.append(current_label + [
+            current_label = [self._label_vocabulary[l] for l in label]
+            current_label += [
                 self._label_vocabulary['[PAD]']
                 for i in range(max_length - length[i])
-            ])
+            ]
+            packed_labels.append(current_label)
 
-        packed_labels = torch.LongTensor(length)
+        packed_labels = torch.LongTensor(packed_labels)
         return packed_sentences, packed_labels, length

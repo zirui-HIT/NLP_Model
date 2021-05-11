@@ -2,10 +2,10 @@ import torch
 import numpy
 import random
 import os
-from biLstmCrf.src.config import args
-from biLstmCrf.src.utils.data import DataManager
-from biLstmCrf.src.utils.model import biLstmCrf
-from biLstmCrf.src.utils.processor import Processor
+from config import args
+from utils.data import DataManager
+from utils.model import biLstmCrf
+from utils.processor import Processor
 
 if __name__ == '__main__':
     torch.manual_seed(args.random_seed)
@@ -18,8 +18,8 @@ if __name__ == '__main__':
         train_data = DataManager('train')
         valid_data = DataManager('valid')
         word_vocabulary, label_vocabulary = train_data.load(
-            args.train_data_path)
-        valid_data.load(args.valid_data_path)
+            args.train_data_path, args.max_length)
+        valid_data.load(args.valid_data_path, args.max_length)
 
         word_vocabulary.append(['[BOS]', '[EOS]'])
         label_vocabulary.append(['[BOL]', '[EOL]'])
@@ -31,7 +31,7 @@ if __name__ == '__main__':
                               embedding_dim=args.embedding_dim,
                               hidden_dim=args.hidden_dim,
                               label_dim=len(label_vocabulary),
-                              dropout=args.dropout,
+                              dropout=args.dropout_rate,
                               padding_idx=word_vocabulary['[PAD]'],
                               begin_idx=label_vocabulary['[BOL]'],
                               end_idx=label_vocabulary['[EOL]'])
@@ -45,13 +45,14 @@ if __name__ == '__main__':
 
         optimizer = torch.optim.Adam(params=model.parameters(),
                                      lr=args.learning_rate)
-        processor(optimizer=optimizer,
-                  epoch=args.epoch,
-                  path=args.model_path,
-                  train_data=train_data,
-                  valid_data=valid_data)
+        processor.fit(optimizer=optimizer,
+                      epoch=args.epoch,
+                      path=args.model_path,
+                      train_data=train_data,
+                      valid_data=valid_data)
     elif args.mode == 'predict':
         test_data = DataManager('test')
+        test_data.load(args.predict_data_path, args.max_length)
 
         processor = Processor(batch_size=args.batch_size)
         processor.load(args.model_path)
@@ -59,7 +60,7 @@ if __name__ == '__main__':
         predict_labels = processor.predict(test_data)
         words = test_data.word()
 
-        with open(args.predict_data_path, 'w') as f:
+        with open(args.save_path, 'w') as f:
             for i in range(len(words)):
                 for j in range(len(words[i])):
                     f.write('%s %s\n' % (words[i][j], predict_labels[i][j]))

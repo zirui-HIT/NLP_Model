@@ -113,15 +113,17 @@ class DataManager(object):
             word_vocabulary = Vocabulary()
             label_vocabulary = Vocabulary()
 
+        cnt = 0
         with open(path, 'r') as f:
             current_words: List[str] = []
             current_labels: List[str] = []
             for line in f:
                 words = line.strip().split()
-                if words[0] == '-DOCSTART-':
-                    continue
 
                 if len(words) == 0:
+                    if len(current_words) == 0:
+                        continue
+
                     self._sentences.append(
                         Sentence(current_words, current_labels))
                     if self._mode == 'train':
@@ -130,10 +132,16 @@ class DataManager(object):
 
                     current_words = []
                     current_labels = []
+                elif words[0] == '-DOCSTART-':
+                    continue
+                else:
+                    current_words.append(words[0])
+                    if self._mode != 'test':
+                        current_labels.append(words[3])
 
-                current_words.append(words[0])
-                if self._mode != 'test':
-                    current_labels.append(words[3])
+                cnt += 1
+                if not (max_length is None) and cnt == max_length:
+                    break
 
         if self._mode == 'train':
             return word_vocabulary, label_vocabulary
