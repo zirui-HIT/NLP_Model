@@ -21,22 +21,22 @@ parser.add_argument('--model_path',
 parser.add_argument('--max_length',
                     '-ml',
                     type=int,
-                    default=None,
+                    default=16,
                     help="max length to be processed")
 parser.add_argument('--batch_size',
                     '-bs',
                     type=int,
-                    default=64,
+                    default=4,
                     help="batch size")
 parser.add_argument('--embedding_dim',
                     '-ed',
                     type=int,
-                    default=16,
+                    default=4,
                     help='dimension of embedding layer')
 parser.add_argument('--hidden_dim',
                     '-hd',
                     type=int,
-                    default=16,
+                    default=4,
                     help='dimension of hidden layer')
 
 # train mode argument

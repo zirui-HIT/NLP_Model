@@ -2,10 +2,10 @@ import torch
 import numpy
 import random
 import os
-from config import args
-from utils.data import DataManager
-from utils.model import biLstmCrf
-from utils.processor import Processor
+from biLstmCrf.src.config import args
+from biLstmCrf.src.utils.data import DataManager
+from biLstmCrf.src.utils.model import biLstmCrf
+from biLstmCrf.src.utils.processor import Processor
 
 if __name__ == '__main__':
     torch.manual_seed(args.random_seed)

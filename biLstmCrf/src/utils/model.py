@@ -24,7 +24,6 @@ class biLstmCrf(torch.nn.Module):
 
         self._end_idx = end_idx
         self._begin_idx = begin_idx
-        self._pad_idx = padding_idx
 
     def forward(self,
                 tokens: torch.Tensor,
@@ -40,16 +39,17 @@ class biLstmCrf(torch.nn.Module):
         batch_size = size[0]
         label_dim = size[1]
         if labels is None:
-            best_point = torch.zeros_like(transition)
-            path = self._pad_idx * torch.ones_like(tokens)
+            best_point = torch.zeros_like(emission)
+            path = torch.zeros_like(tokens)
             for i in range(batch_size):
                 alpha = emission[i][0]
                 for j in range(1, length[i] - 1):
                     for k in range(label_dim):
                         best_point[i][j][k] = torch.argmax(alpha +
-                                                           transition[k])
+                                                           (transition.T)[k])
                     for k in range(label_dim):
-                        alpha[k] = (alpha + transition[k])[best_point[i][j][k]]
+                        alpha[k] = (alpha +
+                                    (transition.T)[k])[best_point[i][j][k]]
 
                 path[i][length[i] - 1] = self._end_idx
                 for j in range(length[i] - 2, -1, 0):
@@ -58,7 +58,7 @@ class biLstmCrf(torch.nn.Module):
 
             return path
         else:
-            probability = torch.FloatTensor(batch_size)
+            neg_log_probability = torch.FloatTensor(batch_size)
             for i in range(batch_size):
                 real_score = torch.FloatTensor()
                 for j in range(length[i]):
@@ -72,11 +72,11 @@ class biLstmCrf(torch.nn.Module):
                         sum_score.unsqueeze(1).expand(label_dim, label_dim) +
                         transition + emission[i][j].unsqueeze(0).expand(
                             label_dim, label_dim))
-                sum_score = torch.sum(sum_score)
+                sum_score = _log_sum_exp(sum_score)
 
-                probability[i] = sum_score - real_score
+                neg_log_probability[i] = sum_score - real_score
 
-            return probability
+            return neg_log_probability
 
 
 def _log_sum_exp(score):

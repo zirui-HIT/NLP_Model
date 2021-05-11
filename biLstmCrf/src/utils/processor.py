@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from tqdm import tqdm
 from typing import List
-from data import Vocabulary, DataManager
+from biLstmCrf.src.utils.data import Vocabulary, DataManager
 
 
 class Processor(object):
@@ -75,10 +75,11 @@ class Processor(object):
 
             predict_labels = list(self._model(packed_sentences, length))
             ret = ret + [
-                predict_labels[i][:length[i]]
+                predict_labels[i][1:length[i] - 1]
                 for i in range(len(predict_labels))
             ]
 
+        ret = [[self._label_vocabulary[x] for x in s] for s in ret]
         return ret
 
     def dump(self, path: str):
@@ -103,9 +104,10 @@ class Processor(object):
         for i in range(len(sentences)):
             sentence = ['[BOS]'] + sentences[i] + ['[EOS]']
             current_sentence = [self._word_vocabulary(w) for w in sentence]
-            packed_sentences.append(current_sentence +
-                                    (max_length - length[i]) *
-                                    self._word_vocabulary['[PAD]'])
+            packed_sentences.append(current_sentence + [
+                self._word_vocabulary['[PAD]']
+                for i in range(max_length - length[i])
+            ])
 
         length = torch.LongTensor(length)
         packed_sentences = torch.LongTensor(length)
@@ -117,8 +119,10 @@ class Processor(object):
         for i in range(len(labels)):
             label = ['[BOL]'] + labels[i] + ['[EOL]']
             current_label = [self._label_vocabulary(l) for l in label]
-            packed_labels.append(current_label + (max_length - length[i]) *
-                                 self._word_vocabulary['[PAD]'])
+            packed_labels.append(current_label + [
+                self._label_vocabulary['[PAD]']
+                for i in range(max_length - length[i])
+            ])
 
         packed_labels = torch.LongTensor(length)
         return packed_sentences, packed_labels, length
