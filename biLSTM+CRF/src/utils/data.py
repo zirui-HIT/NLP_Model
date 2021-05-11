@@ -85,18 +85,6 @@ class Vocabulary(object):
     def __len__(self):
         return self._word_count
 
-    def __add__(self, o):
-        words = []
-        vocabulary = Vocabulary()
-
-        for w in o._word2index:
-            words.append(w)
-        for w in self._word2index:
-            words.append(w)
-
-        vocabulary.append(words)
-        return vocabulary
-
 
 class Sentence(object):
     def __init__(self, words: List[str], labels: List[str]):
