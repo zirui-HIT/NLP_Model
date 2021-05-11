@@ -66,6 +66,8 @@ class Processor(object):
         return label_cnt / label_sum
 
     def predicte(self, data: DataManager):
+        self._model.eval()
+
         ret: List[List[int]] = []
         package = data.package(self._batch_size, False)
         for current_sentences, current_labels in tqdm(package):
