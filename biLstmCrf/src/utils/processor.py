@@ -9,10 +9,10 @@ class Processor(object):
     def __init__(self,
                  batch_size: int,
                  word_vocabulary: Vocabulary = None,
-                 slot_vocabulary: Vocabulary = None,
+                 label_vocabulary: Vocabulary = None,
                  model: torch.nn.Module = None):
         self._word_vocabulary = word_vocabulary
-        self._slot_vocabulary = slot_vocabulary
+        self._label_vocabulary = label_vocabulary
         self._batch_size = batch_size
         self._model = model
 
@@ -69,54 +69,54 @@ class Processor(object):
         ret: List[List[int]] = []
         package = data.package(self._batch_size, False)
         for current_sentences, current_labels in tqdm(package):
-            packed_sentences, length = self._wrap_sentence(
-                current_sentences)
+            packed_sentences, length = self._wrap_sentence(current_sentences)
 
             predict_labels = list(self._model(current_sentences, length))
-            ret = ret + [predict_labels[i][:length[i]]
-                         for i in range(len(predict_labels))]
+            ret = ret + [
+                predict_labels[i][:length[i]]
+                for i in range(len(predict_labels))
+            ]
 
         return ret
 
     def dump(self, path: str):
         torch.save(self._model, path + '.pkl')
-        self._slot_vocabulary.dump(path + '_slot_vocabulary.txt')
+        self._label_vocabulary.dump(path + '_slot_vocabulary.txt')
         self._word_vocabulary.dump(path + '_word_vocabulary.txt')
 
     def load(self, path: str):
         self._model = torch.load(path + '.pkl')
-        self._slot_vocabulary = Vocabulary()
+        self._label_vocabulary = Vocabulary()
         self._word_vocabulary = Vocabulary()
-        self._slot_vocabulary.load(path + '_slot_vocabulary.txt')
+        self._label_vocabulary.load(path + '_slot_vocabulary.txt')
         self._word_vocabulary.load(path + '_word_vocabulary.txt')
 
-    def _warp_sentence(self, sentences: List[List[str]],
+    def _warp_sentence(self,
+                       sentences: List[List[str]],
                        labels: List[List[str]] = None):
-        length: List[int] = []
-        max_length = len(max(sentences, key=len))
-        packed_sentences = []
+        length = [2 + len(s) for s in sentences]
+        max_length = len(length)
 
+        packed_sentences = []
         for i in range(len(sentences)):
-            current_sentence = []
-            length.append(len(sentences[i]))
-            for j in range(length[i]):
-                current_sentence.append(self._word_vocabulary(sentences[i][j]))
-            packed_sentences.append(
-                current_sentence + (max_length - length[i]) * self._word_vocabulary['[PAD]'])
+            sentence = ['[BOS]'] + sentences[i] + ['[EOS]']
+            current_sentence = [self._word_vocabulary(w) for w in sentence]
+            packed_sentences.append(current_sentence +
+                                    (max_length - length[i]) *
+                                    self._word_vocabulary['[PAD]'])
 
         length = torch.LongTensor(length)
         packed_sentences = torch.LongTensor(length)
 
-        if not(labels is None):
-            packed_labels = []
-            for i in range(len(labels)):
-                current_label = []
-                for j in range(length[i]):
-                    current_label.append(self._slot_vocabulary(labels[i][j]))
-                packed_labels.append(
-                    current_label + (max_length - length[i]) * self._word_vocabulary['[PAD]'])
+        if labels is None:
+            return packed_sentences, length
 
-            packed_labels = torch.LongTensor(length)
-            return packed_sentences, packed_labels, length
+        packed_labels = []
+        for i in range(len(labels)):
+            label = ['[BOL]'] + labels[i] + ['[EOL]']
+            current_label = [self._label_vocabulary(l) for l in label]
+            packed_labels.append(current_label + (max_length - length[i]) *
+                                 self._word_vocabulary['[PAD]'])
 
-        return packed_sentences, length
+        packed_labels = torch.LongTensor(length)
+        return packed_sentences, packed_labels, length
