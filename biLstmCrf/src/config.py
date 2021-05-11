@@ -21,7 +21,7 @@ parser.add_argument('--model_path',
 parser.add_argument('--max_length',
                     '-ml',
                     type=int,
-                    default=128,
+                    default=512,
                     help="max length to be processed")
 parser.add_argument('--batch_size',
                     '-bs',
@@ -50,7 +50,7 @@ parser.add_argument('--valid_data_path',
                     type=str,
                     default='Data/Named_Entity_Recognition/valid.txt',
                     help="path of valid data")
-parser.add_argument('--epoch', '-e', type=int, default=20, help="epoch")
+parser.add_argument('--epoch', '-e', type=int, default=200, help="epoch")
 parser.add_argument('--learning_rate',
                     '-lr',
                     type=float,

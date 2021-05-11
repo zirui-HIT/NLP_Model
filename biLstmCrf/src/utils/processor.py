@@ -35,6 +35,7 @@ class Processor(object):
 
                 loss = self._model(packed_sentences, length, packed_labels)
                 loss_sum += loss.item()
+
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
@@ -77,6 +78,7 @@ class Processor(object):
                 predict_labels[i][1:length[i] - 1]
                 for i in range(len(predict_labels))
             ]
+        self._model.train()
 
         ret = [[self._label_vocabulary[int(x)] for x in s] for s in ret]
         return ret
@@ -110,6 +112,8 @@ class Processor(object):
             packed_sentences.append(current_sentence)
 
         packed_sentences = torch.LongTensor(packed_sentences)
+        if torch.cuda.is_available():
+            packed_sentences = packed_sentences.cuda()
         if labels is None:
             return packed_sentences, length
 

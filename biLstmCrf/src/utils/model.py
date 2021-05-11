@@ -58,21 +58,22 @@ class biLstmCrf(torch.nn.Module):
         else:
             neg_log_probability = torch.FloatTensor(batch_size)
             for i in range(batch_size):
-                real_score = torch.tensor(0.0)
-                for j in range(length[i]):
-                    real_score += emission[i][j][labels[i][j]]
+                real_score = torch.clone(emission[i][0][labels[i][0]])
                 for j in range(1, length[i]):
-                    real_score += transition[labels[i][j - 1]][labels[i][j]]
+                    real_score += emission[i][j][labels[i][j]] + \
+                        transition[labels[i][j - 1]][labels[i][j]]
 
-                sum_score = torch.clone(emission[i][0])
+                alpha = [emission[i][0]]
                 for j in range(1, length[i]):
-                    sum_score = _log_sum_exp(
-                        sum_score.unsqueeze(1).expand(label_dim, label_dim) +
+                    alpha.append(_log_sum_exp(
+                        alpha[j-1].unsqueeze(1).expand(label_dim, label_dim) +
                         transition + emission[i][j].unsqueeze(0).expand(
-                            label_dim, label_dim))
-                sum_score = _log_sum_exp(sum_score)
+                            label_dim, label_dim)))
+                log_sum_score = _log_sum_exp(alpha[-1])
 
-                neg_log_probability[i] = sum_score - real_score
+                neg_log_probability[i] = log_sum_score - real_score
+                if neg_log_probability[i] < 0:
+                    raise Exception('illegal')
 
             return torch.sum(neg_log_probability)
 
@@ -80,4 +81,4 @@ class biLstmCrf(torch.nn.Module):
 def _log_sum_exp(score):
     max_value = torch.max(score)
     return max_value + torch.log(
-        torch.sum(torch.exp(score - max_value), dim=-1))
+        torch.sum(torch.exp(score - max_value), dim=0))
