@@ -46,7 +46,7 @@ class Vocabulary(object):
         """
         if isinstance(key, str):
             if not (key in self._word2index):
-                return self._word2index['[PAD]']
+                return self._word2index['[UNK]']
             return self._word2index[key]
         else:
             return self._index2word[key]
