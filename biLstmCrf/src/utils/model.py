@@ -13,7 +13,6 @@ class biLstmCrf(torch.nn.Module):
                                              padding_idx=padding_idx)
         self._lstm = torch.nn.LSTM(input_size=embedding_dim,
                                    hidden_size=hidden_dim,
-                                   dropout=dropout,
                                    bidirectional=True,
                                    batch_first=True)
         self._emission = torch.nn.Linear(in_features=2 * hidden_dim,
