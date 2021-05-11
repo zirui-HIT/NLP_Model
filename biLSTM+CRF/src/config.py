@@ -28,6 +28,16 @@ parser.add_argument('--batch_size',
                     type=int,
                     default=64,
                     help="batch size")
+parser.add_argument('--embedding_dim',
+                    '-ed',
+                    type=int,
+                    default=16,
+                    help='dimension of embedding layer')
+parser.add_argument('--hidden_dim',
+                    '-hd',
+                    type=int,
+                    default=16,
+                    help='dimension of hidden layer')
 
 # train mode argument
 parser.add_argument('--train_data_path',
@@ -40,11 +50,7 @@ parser.add_argument('--valid_data_path',
                     type=str,
                     default='Data/Named_Entity_Recognition/valid.txt',
                     help="path of valid data")
-parser.add_argument('--epoch',
-                    '-e',
-                    type=int,
-                    default=20,
-                    help="epoch")
+parser.add_argument('--epoch', '-e', type=int, default=20, help="epoch")
 parser.add_argument('--learning_rate',
                     '-lr',
                     type=float,
@@ -55,12 +61,6 @@ parser.add_argument('--dropout_rate',
                     type=float,
                     default=0.3,
                     help="dropout")
-parser.add_argument('--embedding_dim',
-                    '-ed',
-                    type=int,
-                    default=16,
-                    help='dimension of embedding layer')
-
 
 # test mode argument
 parser.add_argument('--predict_data_path',
@@ -68,10 +68,11 @@ parser.add_argument('--predict_data_path',
                     type=str,
                     default='Data/Named_Entity_Recognition/test.txt',
                     help="path of test data")
-parser.add_argument('--save_path',
-                    '-sp',
-                    type=str,
-                    default='Data/Named_Entity_Recognition/result_biLSTM+CRF.tsv',
-                    help="output path")
+parser.add_argument(
+    '--save_path',
+    '-sp',
+    type=str,
+    default='Data/Named_Entity_Recognition/result_biLSTM+CRF.tsv',
+    help="output path")
 
 args = parser.parse_args()
