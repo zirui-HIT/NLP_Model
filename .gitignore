@@ -3,4 +3,4 @@
 fastText/src/utils/__pycache__
 fastText/src/__pycache__
 
-biLSTM+CRF/src/__pycache__
+biLstmCrf/src/__pycache__
