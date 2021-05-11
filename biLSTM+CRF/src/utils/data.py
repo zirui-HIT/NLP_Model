@@ -9,6 +9,7 @@ class Vocabulary(object):
 
     Attributes:
     """
+
     def __init__(self):
         """Instantiate vocabulary
         """
@@ -149,6 +150,9 @@ class DataManager(object):
 
         if self._mode == 'train':
             return word_vocabulary, label_vocabulary
+
+    def label(self) -> List[List[int]]:
+        return [s.labels() for s in self._sentences]
 
     def package(self, batch_size: int, shuffle: bool = True):
         words = []
