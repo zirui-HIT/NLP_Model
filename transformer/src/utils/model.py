@@ -37,22 +37,24 @@ class Transformer(torch.nn.Module):
         output = []
         current_idx = self._bos_idx * torch.ones([batch_size, 1])
         for t in range(1, self._max_length):
-            current_idx = current_idx.unsqueeze(1)
             current_state = self._zh_embedding(
-                current_idx) + self._position_embedding(batch_size, 1, self._embedding_dim)
+                current_idx) + self._position_embedding(batch_size, t, self._embedding_dim)
+            current_state = torch.cat([current_state, torch.zeros(
+                [batch_size, 1, self._embedding_dim])], dim=1)
             for i in range(self._layer_num):
                 current_state = (self._decoders[i])(
                     self._dropout(current_state), encoder_attention[i])
 
             current_score = self._linear(current_state)
-            current_score = current_score[:, 0, :]
+            current_score = current_score[:, t, :]
             output.append(current_score)
 
             # teacher forcing
             if not(self._teacher_forcing_ratio is None) and not(targets is None) and random.random() < self._teacher_forcing_ratio:
-                current_idx = targets[:, t, :]
+                current_idx = torch.cat([current_idx, targets[:, t, :]], dim=1)
             else:
-                current_idx = torch.argmax(current_score)
+                current_idx = torch.cat(
+                    [current_idx, torch.argmax(current_score)], dim=1)
 
         output = torch.FloatTensor(output)
         return output.permute(1, 0, 2)
