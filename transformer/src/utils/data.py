@@ -87,11 +87,12 @@ class DataManager(object):
         self._sentences: List[Sentence] = []
         self._mode = mode
 
-    def load(self, path: str) -> Tuple(Vocabulary, Vocabulary):
+    def load(self, path: str, max_line: int):
         """load data from given path
 
         Args:
             path: path of data
+            max_line: max line to read
 
         Returns:
             Vocabulary: english vocabulary if mode is train
@@ -106,14 +107,19 @@ class DataManager(object):
             en_vocabulary = Vocabulary()
             zh_vocabulary = Vocabulary()
 
+        max_length = 0
         with open(path, 'r', encoding='utf-8') as f:
             for line in f:
                 current_data = json.loads(line)
 
-                current_zh_sentence = self._tokenize(current_data['chinese'],
-                                                     en_stopwords)
+                if self._mode != 'test':
+                    current_zh_sentence = self._tokenize(current_data['chinese'],
+                                                         en_stopwords)
+                else:
+                    current_zh_sentence = []
                 current_en_sentence = self._tokenize(current_data['english'],
                                                      zh_stopwords)
+                max_length = max(max_length, len(current_en_sentence))
 
                 self._sentences.append(
                     Sentence(current_en_sentence, current_zh_sentence))
@@ -125,7 +131,8 @@ class DataManager(object):
                         en_vocabulary.append(w)
 
         if self._mode == 'train':
-            return en_vocabulary, zh_vocabulary
+            return max_length, en_vocabulary, zh_vocabulary
+        return max_length
 
     def package(self, batch_size: bool, shuffle: bool) -> DataLoader:
         """pack the data
