@@ -14,6 +14,8 @@ class ELMo(torch.nn.Module):
             hidden_size: size of every lstm layer
             padding_idx: idx of padding sign
         """
+        super(ELMo, self).__init__()
+
         self._embedding = torch.nn.Embedding(
             num_embeddings=vocabulary_size, embedding_dim=embedding_dim, padding_idx=padding_idx)
 
