@@ -30,7 +30,7 @@ class ELMo(torch.nn.Module):
 
         # for predict
         self._gamma = torch.nn.Parameter(torch.FloatTensor())
-        self._s = torch.nn.Parameter(torch.FloatTensor(lstm_layer_num))
+        self._s = torch.nn.Parameter(torch.FloatTensor(1 + lstm_layer_num))
 
     def fit(self, pieces: torch.LongTensor):
         x = self._embedding(pieces)
@@ -42,17 +42,12 @@ class ELMo(torch.nn.Module):
 
     def forward(self, pieces: torch.LongTensor):
         embedded = self._embedding(pieces)
-        ret = None
+        ret = self._s[0] * embedded
 
         x = embedded
         for i in range(len(self._lstm)):
             current_x, _ = self._lstm[i](x)
-
-            if ret is None:
-                ret = self._s[i] * current_x
-            else:
-                ret = ret + self._s[i] * current_x
-
+            ret = ret + self._s[i + 1] * current_x
             # ResNet
             x = x + current_x
 
