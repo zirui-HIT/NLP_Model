@@ -158,7 +158,7 @@ class DataManager(object):
     def _tokenize(self, sentence: str, stopwords: List[str]) -> List[str]:
         words = word_tokenize(sentence)
         words = [w.lower() for w in words if w not in stopwords]
-        return words
+        return ['<BOS>'] + words + ['<EOS>']
 
 
 class _DataSet(object):
