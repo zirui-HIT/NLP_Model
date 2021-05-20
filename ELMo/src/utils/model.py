@@ -35,7 +35,8 @@ class ELMo(torch.nn.Module):
     def fit(self, pieces: torch.LongTensor):
         x = self._embedding(pieces)
         for lstm in self._lstm:
-            x, _ = lstm(x)
+            current_x, _ = lstm(x)
+            x = x + current_x
         x = self._linear(x)
         return x
 
@@ -45,12 +46,15 @@ class ELMo(torch.nn.Module):
 
         x = embedded
         for i in range(len(self._lstm)):
-            x, _ = self._lstm[i](x)
+            current_x, _ = self._lstm[i](x)
 
             if ret is None:
-                ret = self._s[i] * x
+                ret = self._s[i] * current_x
             else:
-                ret = ret + self._s[i] * x
+                ret = ret + self._s[i] * current_x
+
+            # ResNet
+            x = x + current_x
 
         # embedding_dim + 2 * hidden_size
         return torch.cat((embedded, self._gamma * ret), 1)
