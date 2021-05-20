@@ -1,5 +1,7 @@
 .vscode
 
+data/Machine_Translation
+
 fastText/src/utils/__pycache__
 fastText/src/__pycache__
 
