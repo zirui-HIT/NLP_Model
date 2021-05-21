@@ -113,8 +113,8 @@ class DataManager(object):
                 current_data = json.loads(line)
 
                 if self._mode != 'test':
-                    current_zh_sentence = self._tokenize(current_data['chinese'],
-                                                         en_stopwords)
+                    current_zh_sentence = self._tokenize(
+                        current_data['chinese'], en_stopwords)
                 else:
                     current_zh_sentence = []
                 current_en_sentence = self._tokenize(current_data['english'],
@@ -133,6 +133,9 @@ class DataManager(object):
         if self._mode == 'train':
             return max_length, en_vocabulary, zh_vocabulary
         return max_length
+
+    def zh_sentences(self):
+        return [s.zh_sentence for s in self._sentences]
 
     def package(self, batch_size: bool, shuffle: bool) -> DataLoader:
         """pack the data
