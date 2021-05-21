@@ -60,8 +60,15 @@ class Vocabulary(object):
 
     def __getitem__(self, key):
         if isinstance(key, str):
-            return self._word2idx[key]
-        return self._idx2word[key]
+            if key in self._word2idx:
+                return self._word2idx[key]
+            else:
+                return self._word2idx['<UNK>']
+        
+        if key in self._idx2word:
+            return self._idx2word[key]
+        else:
+            return '<UNK>'
 
     def __len__(self):
         return self._word_num
