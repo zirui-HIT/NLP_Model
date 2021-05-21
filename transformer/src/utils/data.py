@@ -1,6 +1,7 @@
 from os import curdir
 from typing import Dict, List, Tuple
 from nltk import word_tokenize
+from jieba import cut
 from torch.utils.data import DataLoader
 
 
@@ -10,10 +11,10 @@ class Vocabulary(object):
         self._idx2word: Dict[int, str] = {}
         self._word_num: int = 0
 
-        self._append('<UNK>')
-        self._append('<PAD>')
-        self._append('<BOS>')
-        self._append('<EOS>')
+        self.append('<UNK>')
+        self.append('<PAD>')
+        self.append('<BOS>')
+        self.append('<EOS>')
 
     def append(self, word: str):
         """append new word to vocabulary
@@ -94,7 +95,7 @@ class DataManager(object):
         self._sentences: List[Sentence] = []
         self._mode = mode
 
-    def load(self, path: str, max_line: int):
+    def load(self, path: str, max_line: int, zh_stopwords_path: str = 'data/chinese_stopwords.txt'):
         """load data from given path
 
         Args:
@@ -108,24 +109,29 @@ class DataManager(object):
         import json
         from nltk.corpus import stopwords
         en_stopwords = set(stopwords.words('english'))
-        zh_stopwords = set(stopwords.words('chinese'))
+        zh_stopwords = []
+        with open(zh_stopwords_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                zh_stopwords.append(line.strip())
+        zh_stopwords = set(zh_stopwords)
 
         if self._mode == 'train':
             en_vocabulary = Vocabulary()
             zh_vocabulary = Vocabulary()
 
         max_length = 0
+        cnt = 0
         with open(path, 'r', encoding='utf-8') as f:
             for line in f:
                 current_data = json.loads(line)
 
                 if self._mode != 'test':
-                    current_zh_sentence = self._tokenize(
-                        current_data['chinese'], en_stopwords)
+                    current_zh_sentence = self._zh_tokenize(
+                        current_data['chinese'], zh_stopwords)
                 else:
                     current_zh_sentence = []
-                current_en_sentence = self._tokenize(current_data['english'],
-                                                     zh_stopwords)
+                current_en_sentence = self._en_tokenize(current_data['english'],
+                                                        en_stopwords)
                 max_length = max(max_length, len(current_en_sentence))
 
                 self._sentences.append(
@@ -136,6 +142,10 @@ class DataManager(object):
                         zh_vocabulary.append(w)
                     for w in current_en_sentence:
                         en_vocabulary.append(w)
+
+                cnt += 1
+                if cnt >= max_length:
+                    break
 
         if self._mode == 'train':
             return max_length, en_vocabulary, zh_vocabulary
@@ -160,17 +170,22 @@ class DataManager(object):
         en_sentences = []
         zh_sentences = []
         for s in self._sentences:
-            en_sentences.append(s.en_sentence)
-            zh_sentences.append(s.zh_sentence)
+            en_sentences.append(s.en_sentence())
+            zh_sentences.append(s.zh_sentence())
 
         return DataLoader(dataset=_DataSet(en_sentences, zh_sentences),
                           batch_size=batch_size,
                           shuffle=shuffle,
                           collate_fn=_collate_fn)
 
-    def _tokenize(self, sentence: str, stopwords: List[str]) -> List[str]:
+    def _en_tokenize(self, sentence: str, stopwords: List[str]) -> List[str]:
         words = word_tokenize(sentence)
         words = [w.lower() for w in words if w not in stopwords]
+        return words
+
+    def _zh_tokenize(self, sentence: str, stopwords: List[str]) -> List[str]:
+        words = cut(sentence)
+        words = [w for w in words if w not in stopwords]
         return words
 
 
