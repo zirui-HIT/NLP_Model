@@ -64,7 +64,7 @@ class Vocabulary(object):
                 return self._word2idx[key]
             else:
                 return self._word2idx['<UNK>']
-        
+
         if key in self._idx2word:
             return self._idx2word[key]
         else:
@@ -142,7 +142,10 @@ class DataManager(object):
         return max_length
 
     def zh_sentences(self):
-        return [s.zh_sentence for s in self._sentences]
+        return [s.zh_sentence() for s in self._sentences]
+
+    def en_sentences(self):
+        return [s.en_sentence() for s in self._sentences]
 
     def package(self, batch_size: bool, shuffle: bool) -> DataLoader:
         """pack the data
