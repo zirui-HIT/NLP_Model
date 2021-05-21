@@ -3,7 +3,7 @@ import random
 
 
 class Transformer(torch.nn.Module):
-    def __init__(self, zh_input_size: int, en_input_size: int, embedding_dim: int, layer_num: int, head_num: int, padding_idx: int, bos_idx: int, output_size: int, dropout: float, max_length: int, teacher_forcing_ratio: float = None):
+    def __init__(self, zh_input_size: int, en_input_size: int, embedding_dim: int, layer_num: int, head_num: int, padding_idx: int, bos_idx: int, dropout: float, max_length: int, teacher_forcing_ratio: float = None):
         super(Transformer, self).__init__()
 
         self._embedding_dim = embedding_dim
@@ -20,7 +20,7 @@ class Transformer(torch.nn.Module):
             head_num, embedding_dim) for i in range(layer_num)]
         self._decoders = [TransformerDecoder(
             head_num, embedding_dim) for i in range(layer_num)]
-        self._linear = torch.nn.Linear(embedding_dim, output_size)
+        self._linear = torch.nn.Linear(embedding_dim, zh_input_size)
         self._dropout = torch.nn.Dropout(dropout)
 
     def forward(self, pieces: torch.LongTensor, targets: torch.LongTensor = None):
