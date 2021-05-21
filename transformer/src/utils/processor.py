@@ -2,6 +2,7 @@ import torch
 from tqdm import tqdm
 from typing import List
 from utils.data import Vocabulary, DataManager
+from nltk.translate.bleu_score import sentence_bleu
 
 
 class Processor(object):
@@ -21,6 +22,7 @@ class Processor(object):
             lr: float,
             train_data: DataManager,
             valid_data: DataManager = None):
+        self._model.train()
         if valid_data is None:
             valid_data = train_data
 
@@ -58,11 +60,16 @@ class Processor(object):
         real_zh_sentences = data.zh_sentences()
 
         # TODO calc BLEU
-        bleu: float
+        bleu = 0
+        for i in range(len(predict_zh_sentences)):
+            bleu += sentence_bleu([predict_zh_sentences[i]],
+                                  real_zh_sentences[i])
 
-        return bleu
+        self._model.train()
+        return bleu / len(predict_zh_sentences)
 
     def predict(self, data: DataManager) -> List[List[str]]:
+        self._model.eval()
         package = data.package(self._batch_size, False)
         ret = []
         for current_en_sentences, current_zh_sentences in tqdm(package):
