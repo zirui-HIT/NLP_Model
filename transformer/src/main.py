@@ -1,3 +1,4 @@
+import os
 import torch
 import numpy
 import random
@@ -22,22 +23,28 @@ if __name__ == '__main__':
     if args.mode == 'train':
         train_data = DataManager('train')
         valid_data = DataManager('valid')
-        max_length, en_vocabulary, zh_vocabulary = train_data.load(
-            args.train_path)
-        valid_data.load(args.valid_path)
+        en_vocabulary, zh_vocabulary = train_data.load(
+            args.train_data_path, args.max_length)
+        valid_data.load(args.valid_data_path, args.max_length)
 
-        model = Transformer(zh_input_size=len(zh_vocabulary),
-                            en_input_size=len(en_vocabulary),
-                            embedding_dim=args.embedding_dim,
-                            layer_num=args.layer_num,
-                            head_num=args.head_num,
-                            padding_idx=en_vocabulary['<PAD>'],
-                            bos_idx=zh_vocabulary['<BOS>'],
-                            dropout=args.dropout,
-                            max_length=max_length,
-                            teacher_forcing_ratio=args.teacher_forcing_ratio)
-        if torch.cuda.is_availabel():
-            model = model.cuda()
+        en_vocabulary.dump(args.model_path + '_en.txt')
+        zh_vocabulary.dump(args.model_path + '_zh.txt')
+
+        if os.path.isfile(args.model_path + '.pkl'):
+            model = torch.load(args.model_path + '.pkl')
+        else:
+            model = Transformer(zh_input_size=len(zh_vocabulary),
+                                en_input_size=len(en_vocabulary),
+                                embedding_dim=args.embedding_dim,
+                                layer_num=args.layer_num,
+                                head_num=args.head_num,
+                                padding_idx=en_vocabulary['<PAD>'],
+                                bos_idx=zh_vocabulary['<BOS>'],
+                                dropout=args.dropout_ratio,
+                                max_length=args.max_zh_length,
+                                teacher_forcing_ratio=args.teacher_forcing_ratio)
+            if torch.cuda.is_available():
+                model = model.cuda()
 
         processor = Processor(batch_size=args.batch_size,
                               en_vocabulary=en_vocabulary,
@@ -50,7 +57,7 @@ if __name__ == '__main__':
                       valid_data=valid_data)
     elif args.mode == 'predict':
         test_data = DataManager('test')
-        test_data.load(args.test_path)
+        test_data.load(args.test_data_path, args.max_length)
 
         processor = Processor(batch_size=args.batch_size)
         processor.load(args.model_path)

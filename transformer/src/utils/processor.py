@@ -1,8 +1,10 @@
+from os import readlink
+import re
 import torch
 from tqdm import tqdm
 from typing import List
 from utils.data import Vocabulary, DataManager
-from nltk.translate.bleu_score import sentence_bleu
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
 
 class Processor(object):
@@ -26,22 +28,26 @@ class Processor(object):
         if valid_data is None:
             valid_data = train_data
 
-        loss_function = torch.nn.CrossEntropy()
+        loss_function = torch.nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(params=self._model.parameters(), lr=lr)
-        self.dump(path, True)
 
         best_bleu = 0
         package = train_data.package(self._batch_size, True)
         for e in range(epoch):
             for current_en_sentences, current_zh_sentences in tqdm(package):
-                current_en_sentences = self.wrap_sentence(
+                current_en_sentences, _ = self._wrap_sentence(
                     current_en_sentences, 'en', True)
-                current_zh_sentences = self.wrap_sentence(
+                current_zh_sentences, current_zh_sentences_length = self._wrap_sentence(
                     current_zh_sentences, 'zh', False)
+                if torch.cuda.is_available():
+                    current_zh_sentences = current_zh_sentences.cuda()
+                    current_en_sentences = current_en_sentences.cuda()
 
                 current_score = self._model(current_en_sentences,
                                             current_zh_sentences)
-                loss = loss_function(current_score, current_zh_sentences)
+                loss = sum([loss_function(current_score[i][:current_zh_sentences_length[i]],
+                                          current_zh_sentences[i][:current_zh_sentences_length[i]])
+                           for i in range(len(current_score))])
 
                 optimizer.zero_grad()
                 loss.backward()
@@ -59,11 +65,10 @@ class Processor(object):
         predict_zh_sentences = self.predict(data)
         real_zh_sentences = data.zh_sentences()
 
-        # TODO calc BLEU
         bleu = 0
         for i in range(len(predict_zh_sentences)):
             bleu += sentence_bleu([predict_zh_sentences[i]],
-                                  real_zh_sentences[i])
+                                  real_zh_sentences[i], smoothing_function=SmoothingFunction().method1)
 
         self._model.train()
         return bleu / len(predict_zh_sentences)
@@ -73,15 +78,18 @@ class Processor(object):
         package = data.package(self._batch_size, False)
         ret = []
         for current_en_sentences, current_zh_sentences in tqdm(package):
-            current_en_sentences = self._wrap_sentence(current_en_sentences,
-                                                       'en', True)
+            current_en_sentences, _ = self._wrap_sentence(current_en_sentences,
+                                                          'en', True)
+            if torch.cuda.is_available():
+                current_en_sentences = current_en_sentences.cuda()
+
             predict_score = self._model(current_en_sentences)
             predict_idx = torch.argmax(predict_score, dim=2)
 
             for b in predict_idx:
                 current_sentence: List[str] = []
                 for i in b:
-                    current_word = self._zh_vocabulary(i)
+                    current_word = self._zh_vocabulary[int(i)]
                     if current_word == '<EOS>':
                         break
                     current_sentence.append(current_word)
@@ -108,11 +116,13 @@ class Processor(object):
                        language: str,
                        with_bos: bool = True):
         max_length: int = 0
+        length: List[int] = []
         for i in range(len((sentences))):
             sentences[i] = sentences[i] + ['<EOS>']
             if with_bos:
                 sentences[i] = ['<BOS>'] + sentences[i]
             max_length = max(max_length, len(sentences[i]))
+            length.append(len(sentences[i]))
         sentences = [
             s + ['<PAD>' for i in range(max_length - len(s))]
             for s in sentences
@@ -125,4 +135,4 @@ class Processor(object):
             sentences = [[self._zh_vocabulary[w] for w in s]
                          for s in sentences]
 
-        return torch.LongTensor(sentences)
+        return torch.LongTensor(sentences), length

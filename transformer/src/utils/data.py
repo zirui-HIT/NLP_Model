@@ -107,19 +107,11 @@ class DataManager(object):
             Vocabulary: chinese vocabulary if mode is train
         """
         import json
-        from nltk.corpus import stopwords
-        en_stopwords = set(stopwords.words('english'))
-        zh_stopwords = []
-        with open(zh_stopwords_path, 'r', encoding='utf-8') as f:
-            for line in f:
-                zh_stopwords.append(line.strip())
-        zh_stopwords = set(zh_stopwords)
 
         if self._mode == 'train':
             en_vocabulary = Vocabulary()
             zh_vocabulary = Vocabulary()
 
-        max_length = 0
         cnt = 0
         with open(path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -127,12 +119,11 @@ class DataManager(object):
 
                 if self._mode != 'test':
                     current_zh_sentence = self._zh_tokenize(
-                        current_data['chinese'], zh_stopwords)
+                        current_data['chinese'])
                 else:
                     current_zh_sentence = []
-                current_en_sentence = self._en_tokenize(current_data['english'],
-                                                        en_stopwords)
-                max_length = max(max_length, len(current_en_sentence))
+                current_en_sentence = self._en_tokenize(
+                    current_data['english'])
 
                 self._sentences.append(
                     Sentence(current_en_sentence, current_zh_sentence))
@@ -144,12 +135,11 @@ class DataManager(object):
                         en_vocabulary.append(w)
 
                 cnt += 1
-                if cnt >= max_length:
+                if cnt >= max_line:
                     break
 
         if self._mode == 'train':
-            return max_length, en_vocabulary, zh_vocabulary
-        return max_length
+            return en_vocabulary, zh_vocabulary
 
     def zh_sentences(self):
         return [s.zh_sentence() for s in self._sentences]
@@ -178,15 +168,14 @@ class DataManager(object):
                           shuffle=shuffle,
                           collate_fn=_collate_fn)
 
-    def _en_tokenize(self, sentence: str, stopwords: List[str]) -> List[str]:
+    def _en_tokenize(self, sentence: str) -> List[str]:
         words = word_tokenize(sentence)
-        words = [w.lower() for w in words if w not in stopwords]
+        words = [w.lower() for w in words]
         return words
 
-    def _zh_tokenize(self, sentence: str, stopwords: List[str]) -> List[str]:
+    def _zh_tokenize(self, sentence: str) -> List[str]:
         words = cut(sentence)
-        words = [w for w in words if w not in stopwords]
-        return words
+        return list(words)
 
 
 class _DataSet(object):

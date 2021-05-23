@@ -21,28 +21,33 @@ parser.add_argument('--model_path',
 parser.add_argument('--max_length',
                     '-ml',
                     type=int,
-                    default=512,
+                    default=256,
                     help="max length to be processed")
 parser.add_argument('--batch_size',
                     '-bs',
                     type=int,
-                    default=16,
+                    default=2,
                     help="batch size")
 parser.add_argument('--embedding_dim',
                     '-ed',
                     type=int,
-                    default=16,
+                    default=128,
                     help='dimension of embedding layer')
 parser.add_argument('--head_num',
                     '-hn',
                     type=int,
-                    default=2,
+                    default=4,
                     help='head number of multi-head attention')
 parser.add_argument('--layer_num',
                     '-ln',
                     type=int,
-                    default=2,
+                    default=4,
                     help='layer number')
+parser.add_argument('--max_zh_length',
+                    '-mzl',
+                    type=int,
+                    default=100,
+                    help='max length of chinese sentence')
 
 # train mode argument
 parser.add_argument('--train_data_path',
@@ -55,13 +60,13 @@ parser.add_argument('--valid_data_path',
                     type=str,
                     default='Data/Machine_Translation/valid.json',
                     help="path of valid data")
-parser.add_argument('--epoch', '-e', type=int, default=200, help="epoch")
+parser.add_argument('--epoch', '-e', type=int, default=10000, help="epoch")
 parser.add_argument('--learning_rate',
                     '-lr',
                     type=float,
-                    default=1e-2,
+                    default=1e-3,
                     help="learning rate")
-parser.add_argument('--dropout_rate',
+parser.add_argument('--dropout_ratio',
                     '-dr',
                     type=float,
                     default=0.3,
